@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#000000">
+<title>Para ti ✦</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- Three.js & GSAP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<style>
+  html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    background-color: #000000;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    color: #fff;
+  }
+  
+  canvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  
+  #lily {
+    pointer-events: none;
+    z-index: 2;
+  }
+  
+  /* Pantalla de inicio estética y dedicada */
+  #intro {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 30px 24px;
+    text-align: center;
+    background: radial-gradient(circle at 50% 50%, rgba(16, 12, 26, 0.85), rgba(0, 0, 0, 0.96));
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    cursor: pointer;
+  }
+  
+  #intro h1 {
+    margin: 0;
+    font-size: clamp(52px, 12vw, 92px);
+    font-weight: 500;
+    font-style: italic;
+    letter-spacing: 0.03em;
+    background: linear-gradient(135deg, #ffffff 20%, #ffd4e8 60%, #bae6fd 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 45px rgba(244, 114, 182, 0.35);
+  }
+
+  #intro .dedication {
+    margin: 0;
+    max-width: 440px;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(18px, 4.4vw, 22px);
+    font-style: italic;
+    line-height: 1.45;
+    color: rgba(245, 230, 245, 0.9);
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.25);
+  }
+  
+  #intro .prompt {
+    margin-top: 10px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(12px, 2.6vw, 13.5px);
+    font-weight: 300;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(245, 215, 235, 0.65);
+    animation: pulsePrompt 3s ease-in-out infinite;
+  }
+  
+  #hint {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+    z-index: 3;
+    text-align: center;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(15px, 3.6vw, 18px);
+    font-style: italic;
+    letter-spacing: 0.5px;
+    color: rgba(245, 215, 235, 0.75);
+    opacity: 0;
+    transition: opacity 1.6s ease;
+    pointer-events: none;
+    padding: 0 20px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.9);
+  }
+  
+  #hint.on {
+    opacity: 0.85;
+  }
+  
+  @keyframes pulsePrompt {
+    0%, 100% { opacity: 0.35; transform: scale(0.99); }
+    50% { opacity: 0.85; transform: scale(1.01); }
+  }
+
+  /* ==========================================================
+     MOMENTO MÁGICO 11:11 DORADO Y ARMONIOSO
+     ========================================================== */
+  #overlay1111 {
+    position: fixed;
+    inset: 0;
+    z-index: 8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 2.2s cubic-bezier(0.16, 1, 0.3, 1);
+    background: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.16), rgba(244, 114, 182, 0.08) 50%, transparent 75%);
+  }
+
+  #overlay1111.active {
+    opacity: 1;
+  }
+
+  /* Velo de Aurora Boreal cósmica suave en el horizonte */
+  .aurora-1111 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 38vh;
+    background: radial-gradient(ellipse at 50% 0%, rgba(245, 158, 11, 0.22) 0%, rgba(244, 114, 182, 0.15) 45%, transparent 80%);
+    animation: breatheAurora 5s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+
+  @keyframes breatheAurora {
+    from { opacity: 0.55; transform: scaleY(0.92); }
+    to { opacity: 0.95; transform: scaleY(1.08); }
+  }
+
+  /* Anillo de polvo estelar giratorio alrededor del 11:11 */
+  .ring-1111 {
+    position: absolute;
+    width: clamp(280px, 62vw, 440px);
+    height: clamp(150px, 34vw, 240px);
+    border-radius: 50%;
+    border: 1px dashed rgba(251, 191, 36, 0.45);
+    box-shadow: 0 0 35px rgba(245, 158, 11, 0.3), inset 0 0 25px rgba(244, 114, 182, 0.2);
+    animation: rotateRing 22s linear infinite;
+    pointer-events: none;
+  }
+
+  .ring-1111::after {
+    content: '✦';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #ffd166;
+    font-size: 15px;
+    text-shadow: 0 0 12px #f59e0b, 0 0 20px #fff;
+  }
+
+  @keyframes rotateRing {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .title-1111 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(88px, 24vw, 180px);
+    font-weight: 600;
+    font-style: italic;
+    letter-spacing: 0.08em;
+    background: linear-gradient(135deg, #ffffff 0%, #fff3b0 30%, #ffd166 60%, #f59e0b 90%, #d97706 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 60px rgba(245, 158, 11, 0.85), 0 0 100px rgba(251, 191, 36, 0.6);
+    animation: glow1111 3s ease-in-out infinite alternate;
+    position: relative;
+    z-index: 2;
+  }
+
+  .sub-1111 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(22px, 5.5vw, 34px);
+    font-style: italic;
+    letter-spacing: 4px;
+    color: #fef3c7;
+    text-shadow: 0 0 20px rgba(251, 191, 36, 0.95), 0 0 35px rgba(245, 158, 11, 0.7);
+    margin-top: -10px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Barra de tiempo estelar sutil que recorre los 60 segundos del 11:11 */
+  .timeline-1111 {
+    position: absolute;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    width: clamp(180px, 50vw, 320px);
+    height: 2px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .timeline-bar-1111 {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #f472b6, #ffd166, #ffffff);
+    box-shadow: 0 0 8px #ffd166;
+    transition: width 0.4s linear;
+  }
+
+  @keyframes glow1111 {
+    from { transform: scale(0.97); filter: drop-shadow(0 0 30px rgba(245, 158, 11, 0.6)); }
+    to { transform: scale(1.03); filter: drop-shadow(0 0 60px rgba(251, 191, 36, 0.9)); }
+  }
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<canvas id="lily"></canvas>
+
+<!-- Pantalla de Bienvenida y Dedicatoria -->
+<div id="intro">
+  <h1>Para ti</h1>
+  <p class="dedication">Velo cuando te sientas triste, o tal vez cuando quieras ver algo bonito.</p>
+  <p class="prompt">toca para entrar</p>
+</div>
+
+<div id="hint">toca cualquier punto para que florezca un lirio · arrastra suavemente para girar</div>
+
+<!-- Cartel Gigante Mágico 11:11 Dorado Armonioso -->
+<div id="overlay1111">
+  <div class="aurora-1111"></div>
+  <div class="ring-1111"></div>
+  <div class="title-1111">11:11</div>
+  <div class="sub-1111">Pide un deseo ✦</div>
+  <div class="timeline-1111"><div class="timeline-bar-1111" id="timelineBar1111"></div></div>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const mobile = matchMedia('(pointer:coarse)').matches || innerWidth < 700;
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const ease = t => 1 - Math.pow(1 - t, 3);
+
+  /* Frases seleccionadas de la galaxia (distribuidas con espacio armónico para que la galaxia respire) */
+  const PHRASES = [
+    '11:11 ✦',
+    '✦ Anggely ✦',
+    '✦ Cielito ✦',
+    'Anggybroaster :)',
+    'Gracias por todo',
+    'Estoy feliz por conocerte',
+    'Te quiero un montón',
+    'Eres muy especial',
+    'Eres increíble',
+    'Tienes toda mi confianza',
+    'Eres mi variable global :)',
+    'Siempre para ti',
+    'Una persona única',
+    'Incondicional',
+    'Vales oro',
+    'Brillas con luz propia',
+    'Aquí siempre',
+  ];
+
+  /* Frases flotantes al tocar para que nazca una flor (con 11:11 incluido, sin "pide un deseo") */
+  const FLOWER_WHISPERS = [
+    '11:11',
+    'Un lirio para ti 🌸',
+    'Gracias por todo',
+    'Estoy feliz por conocerte',
+    'Siempre aquí',
+    'Vales oro',
+    '✦ Cielito ✦',
+    '✦ Anggybroaster ✦ djsaj',
+    'Incondicional',
+    'Te quiero un montón',
+    'Eres increíble',
+    'De esas personas que alegran el día',
+    'Aquí siempre que lo necesites',
+    'Una persona única',
+    '✦ 11:11 ✦'
+  ];
+
+  /* ==========================================================
+     1. THREE.JS: ENCUADRE ÓPTIMO EN CELULARES Y COMPUTADORAS
+     - En celulares portrait: la cámara se aleja y la galaxia se inclina
+       más hacia el frente para que NO quede achatada ni tapada.
+     - Nebulosas cósmicas de fondo y galaxias lejanas para llenar el espacio.
+     ========================================================== */
+  const glCanvas = $('gl');
+  const renderer = new THREE.WebGLRenderer({ canvas: glCanvas, alpha: false, antialias: false, powerPreference: 'high-performance' });
+  renderer.setClearColor(0x000000, 1);
+  const PR = Math.min(devicePixelRatio || 1, mobile ? 1.5 : 2);
+  renderer.setPixelRatio(PR);
+
+  /* Fix robusto: Evitar que la galaxia desaparezca al cambiar de pestaña/app o suspender */
+  let _contextLost = false;
+  glCanvas.addEventListener('webglcontextlost', e => {
+    e.preventDefault();
+    _contextLost = true;
+  }, false);
+  glCanvas.addEventListener('webglcontextrestored', () => {
+    _contextLost = false;
+    if (typeof resumeApp === 'function') resumeApp();
+  }, false);
+  
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(mobile ? 62 : 52, 1, 0.1, 500);
+
+  // Jerarquía cósmica
+  const cosmicDrift = new THREE.Group();
+  const world = new THREE.Group();
+  const galaxy = new THREE.Group();
+  
+  world.add(galaxy);
+  cosmicDrift.add(world);
+  scene.add(cosmicDrift);
+  
+  // Inclinación inicial: más frontal en móviles para apreciar toda la espiral
+  world.rotation.x = mobile ? 0.82 : 0.60;
+
+  const pointMat = (alpha, sizeMult = 14.8) => new THREE.ShaderMaterial({
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    uniforms: { 
+      uPx: { value: PR }, 
+      uAlpha: { value: alpha },
+      uSizeMult: { value: sizeMult }
+    },
+    vertexShader: `
+      attribute float aSize; 
+      attribute vec3 aColor; 
+      uniform float uPx; 
+      uniform float uSizeMult;
+      varying vec3 vC;
+      void main(){ 
+        vC = aColor; 
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        gl_PointSize = aSize * uPx * (uSizeMult / -mv.z); 
+        gl_Position = projectionMatrix * mv; 
+      }`,
+    fragmentShader: `
+      uniform float uAlpha; 
+      varying vec3 vC;
+      void main(){ 
+        float d = length(gl_PointCoord - 0.5); 
+        float a = smoothstep(0.5, 0.0, d); 
+        a *= a;
+        gl_FragColor = vec4(vC, a * uAlpha); 
+      }`
+  });
+
+  /* Paleta cromática astronómica real:
+     - Núcleo blanco diamante -> Ámbar dorado cálido (#ffc885, #f59e0b)
+     - Brazos: Nebulosas rosa magenta (#ec4899) y cúmulos azul eléctrico (#38bdf8)
+     - Velo exterior: Violeta zafiro (#6366f1)
+  */
+  const R = 9.8, ARMS = 4, SPIN = 1.32;
+  const cCoreHot = new THREE.Color('#ffffff');
+  const cCoreAmber = new THREE.Color('#ffc885');
+  const cMagenta = new THREE.Color('#e84393');
+  const cCyanBlue = new THREE.Color('#38bdf8');
+  const cOuterViolet = new THREE.Color('#6366f1');
+  const tmp = new THREE.Color();
+
+  function buildRealisticGalaxy(n, sizeFn, scatterK, alpha, brightMin) {
+    const pos = new Float32Array(n * 3), col = new Float32Array(n * 3), siz = new Float32Array(n);
+    for (let i = 0; i < n; i++) {
+      const r = Math.pow(Math.random(), 1.7) * R + 0.12;
+      const a = (i % ARMS) / ARMS * Math.PI * 2 + r * SPIN;
+      const sc = () => (Math.random() < .5 ? -1 : 1) * Math.pow(Math.random(), 2.4) * (0.24 + r * 0.18) * scatterK;
+      
+      pos[i*3]   = Math.cos(a) * r + sc();
+      pos[i*3+1] = sc() * 0.36 * (1 - r / R * 0.55);
+      pos[i*3+2] = Math.sin(a) * r + sc();
+      
+      const t = r / R;
+
+      if (t < 0.22) {
+        tmp.copy(cCoreHot).lerp(cCoreAmber, t / 0.22);
+      } else if (t < 0.65) {
+        const blend = (t - 0.22) / 0.43;
+        const armType = (i % 2 === 0);
+        const targetColor = armType ? cMagenta : cCyanBlue;
+        tmp.copy(cCoreAmber).lerp(targetColor, blend);
+        if (Math.random() > 0.6) tmp.lerp(armType ? cCyanBlue : cMagenta, 0.4);
+      } else {
+        const blend = (t - 0.65) / 0.35;
+        tmp.copy(cMagenta).lerp(cOuterViolet, blend);
+        if (Math.random() > 0.5) tmp.lerp(cCyanBlue, 0.35);
+      }
+
+      const b = brightMin + Math.random() * (1 - brightMin);
+      col[i*3] = tmp.r * b; 
+      col[i*3+1] = tmp.g * b; 
+      col[i*3+2] = tmp.b * b;
+      siz[i] = sizeFn();
+    }
+
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    g.setAttribute('aColor', new THREE.BufferAttribute(col, 3));
+    g.setAttribute('aSize', new THREE.BufferAttribute(siz, 1));
+    const p = new THREE.Points(g, pointMat(alpha, 14.8));
+    p.frustumCulled = false;
+    return p;
+  }
+
+  galaxy.add(buildRealisticGalaxy(mobile ? 36000 : 88000, () => 0.55 + Math.pow(Math.random(), 3) * 2.6, 1, 0.92, 0.55));
+  galaxy.add(buildRealisticGalaxy(mobile ? 350 : 700, () => 28 + Math.random() * 42, 1.4, 0.07, 0.85));
+
+  /* ==========================================================
+     2. GALAXIAS LEJANAS Y NEBULOSAS EN EL ESPACIO PROFUNDO
+     Para que el espacio no quede vacío ni aburrido
+     ========================================================== */
+  function createDistantGalaxy(x, y, z, size, colorA, colorB, angle) {
+    const count = 750;
+    const pos = new Float32Array(count * 3), col = new Float32Array(count * 3), siz = new Float32Array(count);
+    const colA = new THREE.Color(colorA);
+    const colB = new THREE.Color(colorB);
+
+    for (let i = 0; i < count; i++) {
+      const r = Math.pow(Math.random(), 1.5) * size;
+      const th = Math.random() * Math.PI * 2 + r * 1.8;
+      const sc = (Math.random() - 0.5) * size * 0.2;
+
+      pos[i*3]   = x + Math.cos(th) * r + sc;
+      pos[i*3+1] = y + (Math.random() - 0.5) * size * 0.15;
+      pos[i*3+2] = z + Math.sin(th) * r * 0.5 + sc;
+
+      const t = r / size;
+      tmp.copy(colA).lerp(colB, t);
+      col[i*3] = tmp.r; col[i*3+1] = tmp.g; col[i*3+2] = tmp.b;
+      siz[i] = 1.2 + Math.random() * 3.5;
+    }
+
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    g.setAttribute('aColor', new THREE.BufferAttribute(col, 3));
+    g.setAttribute('aSize', new THREE.BufferAttribute(siz, 1));
+    const p = new THREE.Points(g, pointMat(0.75, 12.0));
+    p.rotation.z = angle;
+    scene.add(p);
+  }
+
+  // Galaxia espiral lejana en cuadrante superior izquierdo (Andrómeda estética)
+  createDistantGalaxy(-60, 48, -120, 18, '#ffd199', '#ec4899', 0.45);
+  // Pequeña galaxia elíptica en cuadrante superior derecho
+  createDistantGalaxy(65, 42, -135, 14, '#ffffff', '#38bdf8', -0.35);
+  // Nube de Magallanes en cuadrante inferior izquierdo
+  createDistantGalaxy(-55, -45, -110, 16, '#f472b6', '#818cf8', 0.2);
+
+  /* Fondo de estrellas visibles, grandes y amarillas */
+  (function () {
+    const n = mobile ? 4500 : 9000;
+    const pos = new Float32Array(n * 3), col = new Float32Array(n * 3), siz = new Float32Array(n);
+    for (let i = 0; i < n; i++) {
+      const rr = 70 + Math.random() * 120;
+      const u = Math.random() * 2 - 1, th = Math.random() * Math.PI * 2, s = Math.sqrt(1 - u * u);
+      pos.set([rr * s * Math.cos(th), rr * u, rr * s * Math.sin(th)], i * 3);
+      
+      const starVar = Math.random();
+      if (starVar < 0.38) {
+        // Estrellas doradas y amarillas
+        tmp.set(Math.random() > 0.5 ? '#ffe082' : '#ffca28');
+      } else if (starVar < 0.72) {
+        // Blancas
+        tmp.set('#ffffff');
+      } else {
+        // Celeste hielo
+        tmp.set('#b3e5fc');
+      }
+      
+      const b = 0.6 + Math.random() * 0.4; 
+      col.set([tmp.r * b, tmp.g * b, tmp.b * b], i * 3);
+      siz[i] = 7.5 + Math.pow(Math.random(), 1.8) * 16.0;
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    g.setAttribute('aColor', new THREE.BufferAttribute(col, 3));
+    g.setAttribute('aSize', new THREE.BufferAttribute(siz, 1));
+    const st = new THREE.Points(g, pointMat(0.96, 21.0)); 
+    st.frustumCulled = false;
+    scene.add(st); 
+    window.__stars = st;
+  })();
+
+  /* Estrellas fugaces amarillas doradas y blancas */
+  const shootingStars = [];
+  function createShootingStar(forceGold = false) {
+    const sx = (Math.random() - 0.5) * 160;
+    const sy = 40 + Math.random() * 60;
+    const sz = -50 - Math.random() * 80;
+    const len = (35 + Math.random() * 25) * (forceGold ? 1.5 : 1);
+    
+    const geom = new THREE.BufferGeometry();
+    const positions = new Float32Array([sx, sy, sz, sx - len, sy - len * 0.6, sz]);
+    geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    
+    const isGold = forceGold || Math.random() > 0.45;
+    const mat = new THREE.LineBasicMaterial({
+      color: isGold ? 0xffd166 : 0xffffff,
+      transparent: true,
+      opacity: isGold ? 0.98 : 0.85,
+      blending: THREE.AdditiveBlending
+    });
+    
+    const line = new THREE.Line(geom, mat);
+    scene.add(line);
+    
+    shootingStars.push({
+      line: line,
+      vx: -(Math.random() * 2.2 + 2.8),
+      vy: -(Math.random() * 1.5 + 1.8),
+      life: 1.0
+    });
+  }
+
+  setInterval(() => {
+    if (Math.random() > 0.35) createShootingStar();
+  }, 3000);
+
+  /* Frases de la galaxia en ROSA PASTEL SUAVE (Escaladas finas en celular para no amontonarse) */
+  function makeSprite(text, k) {
+    const font = "italic 500 56px 'Cormorant Garamond',Georgia,serif";
+    const c = document.createElement('canvas'), x = c.getContext('2d');
+    x.font = font;
+    const textW = Math.ceil(x.measureText(text).width);
+    const w = textW + 90, h = 130;
+    c.width = w; c.height = h;
+
+    x.font = font; 
+    x.textAlign = 'center'; 
+    x.textBaseline = 'middle';
+    
+    x.shadowColor = 'rgba(244, 114, 182, 0.85)'; 
+    x.shadowBlur = 18; 
+    x.fillStyle = '#fce7f3'; 
+    x.fillText(text, w / 2, h / 2);
+    x.fillText(text, w / 2, h / 2);
+
+    const tex = new THREE.CanvasTexture(c);
+    tex.minFilter = THREE.LinearFilter; 
+    tex.generateMipmaps = false;
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, opacity: 0.92 }));
+    
+    // Escala delicada: en móviles mide la mitad para no tapar la galaxia
+    const s = mobile ? 0.0068 : 0.0125;
+    sp.scale.set(w * s, h * s, 1);
+    return sp;
+  }
+
+  function buildPhrases() {
+    PHRASES.forEach((t, k) => {
+      // Distribución armónica a lo largo de los brazos para no encimarse
+      const r = 2.6 + (k / PHRASES.length) * (R * 0.65);
+      const arm = (k * 3) % ARMS;
+      const a = (arm / ARMS) * Math.PI * 2 + r * SPIN;
+      const sp = makeSprite(t, k);
+
+      // Alternar altura para dar dinamismo en 3D
+      const hOffset = ((k % 2 === 0 ? 0.45 : -0.45) + Math.sin(k * 1.5) * 0.25);
+      sp.position.set(Math.cos(a) * r, hOffset, Math.sin(a) * r);
+      galaxy.add(sp);
+    });
+  }
+
+  const fontReady = document.fonts && document.fonts.load
+    ? Promise.race([document.fonts.load("italic 500 56px 'Cormorant Garamond'").catch(() => {}), new Promise(r => setTimeout(r, 1500))])
+    : Promise.resolve();
+  fontReady.then(buildPhrases);
+
+  /* ==========================================================
+     3. LIRIOS CELESTES Y ROSADOS CON MORFOLOGÍA BOTÁNICA REAL
+     - Crecen hasta donde se hizo clic
+     - Tallo orgánico esbelto con curvatura y grosor natural
+     ========================================================== */
+  const lc = $('lily'), lx = lc.getContext('2d');
+  let W = 0, H = 0, baseZ = 20, zoom = 1, enter = 0, started = false;
+  const lilies = [];
+  const floatingTexts = [];
+  const wishOrbs = [];
+  const goldenRipples = [];
+
+  // Paletas botánicas totalmente variadas: Azul puro, Rosa puro y Bicolor celeste/rosado
+  const LILY_PALS = [
+    // 1. Lirio AZUL PURO (Celeste cielo y azul zafiro intenso con blanco)
+    { type: 'blue', throat: '#bae6fd', midColor: '#38bdf8', tipColor: '#0284c7', edgeColor: '#0369a1', dots: '#075985', anther: '#d97706' },
+    // 2. Lirio ROSA PURO (Rosa pastel suave y magenta floral puro)
+    { type: 'pink', throat: '#fce7f3', midColor: '#f472b6', tipColor: '#db2777', edgeColor: '#be185d', dots: '#9d174d', anther: '#b45309' },
+    // 3. Lirio AZUL ELÉCTRICO / COBALTO PURO
+    { type: 'blue', throat: '#e0f2fe', midColor: '#60a5fa', tipColor: '#2563eb', edgeColor: '#1d4ed8', dots: '#1e3a8a', anther: '#d97706' },
+    // 4. Lirio ROSA BEBÉ / BLUSH PURO
+    { type: 'pink', throat: '#ffe4e6', midColor: '#fb7185', tipColor: '#e11d48', edgeColor: '#be123c', dots: '#881337', anther: '#b45309' },
+    // 5. Lirio BICOLOR: Cuerpo Celeste cielo con bordes y puntas Rosa Pastel
+    { type: 'bicolor', throat: '#86efac', midColor: '#38bdf8', tipColor: '#f472b6', edgeColor: '#ec4899', dots: '#be185d', anther: '#d97706' },
+    // 6. Lirio BICOLOR: Cuerpo Rosa Pastel con bordes y puntas Celeste eléctrico
+    { type: 'bicolor', throat: '#a7f3d0', midColor: '#f472b6', tipColor: '#0ea5e9', edgeColor: '#38bdf8', dots: '#0369a1', anther: '#b45309' },
+    // 7. Lirio BICOLOR: Acuarela Celeste cristalino y Rosa fucsia suave
+    { type: 'bicolor', throat: '#6ee7b7', midColor: '#7dd3fc', tipColor: '#f43f5e', edgeColor: '#e11d48', dots: '#9f1239', anther: '#d97706' }
+  ];
+
+  function resize() {
+    const nw = window.innerWidth || document.documentElement.clientWidth || W || 360;
+    const nh = window.innerHeight || document.documentElement.clientHeight || H || 640;
+    if (nw <= 0 || nh <= 0) return;
+    W = nw; H = nh;
+    const d = Math.min(window.devicePixelRatio || 1, 2);
+    lc.width = W * d; lc.height = H * d; 
+    lx.setTransform(d, 0, 0, d, 0, 0);
+    renderer.setPixelRatio(d);
+    renderer.setSize(W, H, false);
+    
+    const aspect = Math.max(0.1, W / Math.max(1, H));
+    camera.aspect = aspect; 
+    
+    // Encuadre astronómico perfecto según la pantalla (celular vs PC)
+    if (aspect < 1) { // Móvil vertical
+      camera.fov = 64;
+      const calcZ = 18.5 / (0.85 * aspect);
+      baseZ = clamp(isNaN(calcZ) ? 28 : calcZ, 24, 38);
+      world.rotation.x = 0.82; // Inclinada de frente para lucirse completa
+    } else { // PC panorámico
+      camera.fov = 52;
+      baseZ = 22;
+      world.rotation.x = 0.60;
+    }
+    camera.updateProjectionMatrix();
+  }
+  addEventListener('resize', resize); resize();
+
+  function drawLeaf(ctx, px, py, ang, len) {
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.rotate(ang);
+    ctx.fillStyle = '#22c55e';
+    ctx.strokeStyle = '#15803d';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.quadraticCurveTo(len * 0.5, -len * 0.18, len, 0);
+    ctx.quadraticCurveTo(len * 0.5, len * 0.14, 0, 0);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawRealLilyPetal(ctx, len, width, pal, isOuter) {
+    ctx.save();
+    
+    const grad = ctx.createLinearGradient(0, 0, 0, -len);
+    grad.addColorStop(0, pal.throat);
+    grad.addColorStop(0.18, '#ffffff');
+    grad.addColorStop(0.55, pal.midColor);
+    grad.addColorStop(1, pal.tipColor);
+
+    ctx.fillStyle = grad;
+    ctx.strokeStyle = pal.edgeColor;
+    ctx.lineWidth = 1.2;
+
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.bezierCurveTo(-width * 0.8, -len * 0.25, -width * 1.15, -len * 0.55, -width * 0.6, -len * 0.85);
+    ctx.bezierCurveTo(-width * 0.2, -len * 0.96, 0, -len * 1.02, 0, -len);
+    ctx.bezierCurveTo(0, -len * 1.02, width * 0.2, -len * 0.96, width * 0.6, -len * 0.85);
+    ctx.bezierCurveTo(width * 1.15, -len * 0.55, width * 0.8, -len * 0.25, 0, 0);
+    ctx.fill();
+    ctx.stroke();
+
+    // Nervadura central
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(0, -len * 0.88);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+    ctx.lineWidth = 1.4;
+    ctx.stroke();
+
+    // Motas botánicas interiores
+    if (!isOuter) {
+      ctx.fillStyle = pal.dots;
+      for (let d = 0; d < 7; d++) {
+        const dotY = -len * (0.22 + d * 0.075) + (Math.sin(d * 2.2) * 2.5);
+        const dotX = (d % 2 === 0 ? 1 : -1) * (width * 0.25);
+        ctx.beginPath();
+        ctx.arc(dotX, dotY, 1.4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    ctx.restore();
+  }
+
+  function drawLily(l, now) {
+    const age = (now - l.t0) / 1000;
+    if (age >= 11) return false;
+    const fade = age > 9.2 ? 1 - (age - 9.2) / 1.8 : 1;
+    const g = ease(clamp(age / 2.5, 0, 1)), b = ease(clamp((age - 1.0) / 1.8, 0, 1));
+    const sway = Math.sin(now / 1500 + l.ph) * 5 * g;
+
+    // Crecen exactamente hasta targetY (donde se dio clic)
+    const x0 = l.x, y0 = H + 6;
+    const totalGrowthDist = y0 - l.targetY;
+    const tipY = y0 - (totalGrowthDist * g);
+    const tipX = x0 + l.lean * g + sway;
+    const cx = x0 - l.lean * 0.35, cy = (y0 + tipY) / 2;
+
+    lx.globalAlpha = fade;
+
+    // Tallo esbelto verde
+    lx.strokeStyle = '#22c55e';
+    lx.lineWidth = 3.2;
+    lx.lineCap = 'round';
+    lx.beginPath();
+    lx.moveTo(x0, y0);
+    lx.quadraticCurveTo(cx, cy, tipX, tipY);
+    lx.stroke();
+
+    // Hojas laterales
+    [[0.32, -0.92], [0.55, Math.PI + 0.92]].forEach(([t, ang]) => {
+      const u = 1 - t;
+      const px = u*u*x0 + 2*u*t*cx + t*t*tipX;
+      const py = u*u*y0 + 2*u*t*cy + t*t*tipY;
+      drawLeaf(lx, px, py, ang, l.L * 0.95 * g);
+    });
+
+    // Flor
+    if (b > 0.02) {
+      const L = l.L * (0.35 + 0.65 * b);
+      lx.save();
+      lx.translate(tipX, tipY);
+      lx.rotate(sway * 0.01 + l.lean * 0.003);
+
+      const w = L * 0.32;
+
+      // Resplandor celestial acorde al color de la flor (azul puro, rosa puro o bicolor)
+      const isBlue = l.pal.type === 'blue';
+      const isPink = l.pal.type === 'pink';
+      const haloColor1 = isBlue ? 'rgba(56, 189, 248, 0.38)' : (isPink ? 'rgba(244, 114, 182, 0.38)' : 'rgba(56, 189, 248, 0.28)');
+      const haloColor2 = isBlue ? 'rgba(2, 132, 199, 0.22)' : (isPink ? 'rgba(219, 39, 119, 0.22)' : 'rgba(244, 114, 182, 0.22)');
+
+      const haloGrad = lx.createRadialGradient(0, -L*0.4, 0, 0, -L*0.4, L * 1.5);
+      haloGrad.addColorStop(0, haloColor1);
+      haloGrad.addColorStop(0.5, haloColor2);
+      haloGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      lx.fillStyle = haloGrad;
+      lx.beginPath();
+      lx.arc(0, -L*0.4, L*1.5, 0, Math.PI*2);
+      lx.fill();
+
+      // 3 pétalos exteriores
+      [-60, 60, 180].forEach(deg => {
+        lx.save();
+        lx.rotate((deg * Math.PI / 180) * b);
+        drawRealLilyPetal(lx, L * 0.96, w * 0.9, l.pal, true);
+        lx.restore();
+      });
+
+      // 3 pétalos interiores
+      [0, -120, 120].forEach(deg => {
+        lx.save();
+        lx.rotate((deg * Math.PI / 180) * b);
+        drawRealLilyPetal(lx, L, w, l.pal, false);
+        lx.restore();
+      });
+
+      // 6 estambres con polen dorado
+      const stamenCount = 6;
+      for (let s = 0; s < stamenCount; s++) {
+        const sAng = (s * (Math.PI * 2) / stamenCount) * 0.85;
+        const filLen = L * 0.52 * b;
+        const ex = Math.sin(sAng) * (L * 0.32) * b;
+        const ey = -filLen - Math.cos(sAng) * 6;
+
+        lx.beginPath();
+        lx.moveTo(0, -2);
+        lx.quadraticCurveTo(ex * 0.45, ey * 0.65, ex, ey);
+        lx.strokeStyle = '#86efac';
+        lx.lineWidth = 1.6;
+        lx.stroke();
+
+        lx.save();
+        lx.translate(ex, ey);
+        lx.rotate(sAng + 0.5);
+        lx.fillStyle = l.pal.anther;
+        lx.shadowColor = '#f59e0b';
+        lx.shadowBlur = 5;
+        lx.beginPath();
+        lx.ellipse(0, 0, 2.4, 5.8, 0, 0, Math.PI * 2);
+        lx.fill();
+        lx.restore();
+      }
+
+      // Pistilo central
+      lx.beginPath();
+      lx.moveTo(0, -2);
+      lx.lineTo(0, -L * 0.60 * b);
+      lx.strokeStyle = '#4ade80';
+      lx.lineWidth = 2.0;
+      lx.stroke();
+
+      lx.fillStyle = '#86efac';
+      lx.beginPath();
+      lx.arc(0, -L * 0.60 * b, 3.0, 0, Math.PI * 2);
+      lx.fill();
+
+      lx.restore();
+    }
+
+    lx.globalAlpha = 1;
+    return true;
+  }
+
+  // Frases flotantes que aparecen con cada flor
+  function drawFloatingText(item, now) {
+    const age = (now - item.t0) / 1000;
+    if (age >= 5.5) return false;
+    
+    let alpha = 1;
+    if (age < 0.6) alpha = age / 0.6;
+    else if (age > 3.8) alpha = 1 - (age - 3.8) / 1.7;
+
+    const curY = item.y - (age * 12);
+
+    lx.save();
+    lx.globalAlpha = alpha;
+    lx.font = "italic 500 22px 'Cormorant Garamond',Georgia,serif";
+    lx.textAlign = 'center';
+    lx.textBaseline = 'bottom';
+    
+    lx.shadowColor = 'rgba(244, 114, 182, 0.85)';
+    lx.shadowBlur = 10;
+    lx.fillStyle = '#ffffff';
+    lx.fillText(item.text, item.x, curY);
+
+    lx.shadowBlur = 0;
+    lx.fillStyle = '#fce7f3';
+    lx.fillText(item.text, item.x, curY);
+
+    lx.restore();
+    return true;
+  }
+
+  let lastWhisperIdx = -1;
+  function spawnLily(targetX, targetY) {
+    if (lilies.length >= 10) lilies.shift();
+    
+    const L = clamp(Math.min(W, H) * 0.08, 38, 64) * (0.9 + Math.random() * 0.2);
+
+    // Selección totalmente aleatoria de color entre azul puro, rosa puro y bicolores
+    const randomPal = LILY_PALS[Math.floor(Math.random() * LILY_PALS.length)];
+
+    lilies.push({
+      x: targetX,
+      targetY: clamp(targetY, 70, H - 20),
+      t0: performance.now(),
+      lean: (Math.random() - 0.5) * 36,
+      ph: Math.random() * 6.28,
+      L: L,
+      pal: randomPal
+    });
+
+    // Selección totalmente aleatoria de la frase (evitando repetir dos veces seguidas la misma)
+    let rIdx = Math.floor(Math.random() * FLOWER_WHISPERS.length);
+    if (rIdx === lastWhisperIdx && FLOWER_WHISPERS.length > 1) {
+      rIdx = (rIdx + 1) % FLOWER_WHISPERS.length;
+    }
+    lastWhisperIdx = rIdx;
+
+    floatingTexts.push({
+      text: FLOWER_WHISPERS[rIdx],
+      x: targetX,
+      y: targetY - 20,
+      t0: performance.now()
+    });
+
+    // En el momento 11:11, cada toque crea una onda expansiva dorada
+    if (is1111Active) {
+      goldenRipples.push({
+        x: targetX,
+        y: targetY,
+        r: 0,
+        alpha: 1.0
+      });
+    }
+
+    bell();
+  }
+
+  /* ==========================================================
+     4. AUDIO: CAMPANITAS CELESTIALES
+     ========================================================== */
+  const SCALE = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.5];
+  let ac, master, delay;
+  function initAudio() {
+    if (ac) return;
+    try {
+      ac = new (window.AudioContext || window.webkitAudioContext)();
+      master = ac.createGain(); master.gain.value = .45;
+      const comp = ac.createDynamicsCompressor(); master.connect(comp); comp.connect(ac.destination);
+      delay = ac.createDelay(1); delay.delayTime.value = .34;
+      const fb = ac.createGain(); fb.gain.value = .36;
+      const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2400;
+      delay.connect(lp); lp.connect(fb); fb.connect(delay); lp.connect(master);
+    } catch (e) { ac = null; }
+  }
+
+  function bell() {
+    if (!ac) return;
+    if (ac.state === 'suspended') ac.resume();
+    const t = ac.currentTime, f = SCALE[(Math.random() * SCALE.length) | 0];
+    const out = ac.createGain();
+    out.gain.setValueAtTime(0, t); out.gain.linearRampToValueAtTime(.2, t + .012);
+    out.gain.exponentialRampToValueAtTime(.0001, t + 2.5);
+    out.connect(master); out.connect(delay);
+    [[1, 1], [2.01, .32], [3.97, .1], [5.4, .04]].forEach(([m, gn]) => {
+      const o = ac.createOscillator(), gg = ac.createGain();
+      o.type = 'sine'; o.frequency.value = f * m; gg.gain.value = gn;
+      o.connect(gg); gg.connect(out); o.start(t); o.stop(t + 2.6);
+    });
+  }
+
+  /* ==========================================================
+     5. DETECCIÓN AUTOMÁTICA DEL MINUTO MÁGICO 11:11 DORADO
+     ========================================================== */
+  const overlay1111 = $('overlay1111');
+  let is1111Active = false;
+
+  function check1111() {
+    const now = new Date();
+    const h = now.getHours();
+    const m = now.getMinutes();
+
+    const activeNow = (h === 11 || h === 23) && (m === 11);
+
+    if (activeNow || window.__force1111) {
+      if (!is1111Active) {
+        is1111Active = true;
+        overlay1111.classList.add('active');
+        bell();
+        for (let k = 0; k < 8; k++) {
+          setTimeout(() => { createShootingStar(true); bell(); }, k * 450);
+        }
+      }
+      // Actualizar sutilmente la barra de tiempo estelar de 60 segundos
+      const sec = window.__force1111 ? (Math.floor(Date.now() / 1000) % 60) : now.getSeconds();
+      const bar = $('timelineBar1111');
+      if (bar) bar.style.width = ((sec / 60) * 100) + '%';
+    } else if (!activeNow && !window.__force1111 && is1111Active) {
+      is1111Active = false;
+      overlay1111.classList.remove('active');
+    }
+  }
+
+  setInterval(check1111, 1000);
+  check1111();
+
+  window.test1111 = (force = true) => {
+    window.__force1111 = force;
+    is1111Active = force;
+    if (force) {
+      overlay1111.classList.add('active');
+      bell();
+      for (let k = 0; k < 8; k++) setTimeout(() => { createShootingStar(true); bell(); }, k * 400);
+    } else {
+      overlay1111.classList.remove('active');
+    }
+  };
+
+  /* ==========================================================
+     6. INTERACCIÓN SLOW-MOTION CON EL RATÓN (CERO ENGANCHE)
+     ========================================================== */
+  let isPointerDown = false;
+  let lastX = 0, lastY = 0;
+  let totalMoved = 0;
+  
+  let targetRotY = 0;
+  let targetRotX = mobile ? 0.82 : 0.60;
+  let currentRotY = 0;
+  let currentRotX = mobile ? 0.82 : 0.60;
+
+  window.addEventListener('pointerdown', e => {
+    if (!started) return;
+    isPointerDown = true;
+    lastX = e.clientX;
+    lastY = e.clientY;
+    totalMoved = 0;
+  });
+
+  window.addEventListener('pointermove', e => {
+    if (!isPointerDown) return;
+    if (e.buttons === 0 && e.pointerType === 'mouse') {
+      isPointerDown = false;
+      return;
+    }
+
+    const dx = e.clientX - lastX;
+    const dy = e.clientY - lastY;
+    totalMoved += Math.abs(dx) + Math.abs(dy);
+
+    targetRotY += dx * 0.0022;
+    targetRotX = clamp(targetRotX + dy * 0.0016, -1.2, 1.2);
+
+    lastX = e.clientX;
+    lastY = e.clientY;
+  });
+
+  const stopPointer = e => {
+    if (!isPointerDown) return;
+    isPointerDown = false;
+    
+    if (totalMoved < 9 && e) {
+      spawnLily(e.clientX, e.clientY);
+    }
+  };
+
+  window.addEventListener('pointerup', stopPointer);
+  window.addEventListener('pointercancel', () => { isPointerDown = false; });
+  window.addEventListener('blur', () => { isPointerDown = false; });
+  window.addEventListener('wheel', e => { zoom = clamp(zoom * (1 + e.deltaY * .0008), .55, 1.5); }, { passive: true });
+
+  // Entrada con GSAP
+  $('intro').addEventListener('pointerup', () => {
+    initAudio(); 
+    if (ac && ac.state === 'suspended') ac.resume();
+    started = true; 
+    
+    gsap.to('#intro', {
+      opacity: 0,
+      duration: 1.6,
+      ease: "power2.out",
+      onComplete: () => {
+        $('intro').style.display = 'none';
+        $('hint').classList.add('on');
+        setTimeout(() => $('hint').classList.remove('on'), 8500);
+      }
+    });
+  });
+
+  /* ==========================================================
+     7. BUCLE PRINCIPAL (SLOW MOTION, ELEGANTE Y REALISTA A 60 FPS)
+     - Se re-lanza automáticamente al volver a la pestaña/app
+     ========================================================== */
+  let last = performance.now();
+  let _rafId = 0;
+  
+  function frame(now) {
+    _rafId = requestAnimationFrame(frame);
+
+    // Si el contexto WebGL se perdió, no intentar renderizar
+    if (_contextLost) return;
+
+    const dt = clamp((now - last) / 1000, 0, .05); 
+    last = now;
+    const time = now / 1000;
+
+    if (started && enter < 1) enter = Math.min(1, enter + dt / 3.4);
+
+    // Giro autónomo constante muy lento
+    if (!isPointerDown) {
+      targetRotY += 0.00075;
+    }
+
+    // Interpolación slow-motion ultrasuave y protegida contra NaN
+    if (isNaN(currentRotY)) currentRotY = 0;
+    if (isNaN(currentRotX)) currentRotX = mobile ? 0.82 : 0.60;
+    if (isNaN(targetRotY)) targetRotY = 0;
+    if (isNaN(targetRotX)) targetRotX = mobile ? 0.82 : 0.60;
+
+    currentRotY += (targetRotY - currentRotY) * 0.045;
+    currentRotX += (targetRotX - currentRotX) * 0.045;
+
+    galaxy.rotation.y = currentRotY;
+    world.rotation.x = currentRotX;
+
+    // Precesión en gravedad cero
+    cosmicDrift.rotation.z = Math.sin(time * 0.2) * 0.035;
+    cosmicDrift.rotation.y = Math.cos(time * 0.16) * 0.025;
+
+    // Estrellas de fondo rotando lentamente
+    if (window.__stars) {
+      window.__stars.rotation.y += dt * 0.0018;
+      window.__stars.rotation.x = Math.sin(time * 0.1) * 0.015;
+    }
+
+    // Durante el minuto 11:11 lluvia constante de estrellas fugaces doradas
+    if (is1111Active && Math.random() < 0.1) {
+      createShootingStar(true);
+    }
+
+    // Spawn wish orbs (luciérnagas doradas) durante 11:11
+    if (is1111Active && Math.random() < 0.08) {
+      wishOrbs.push({
+        x: Math.random() * W,
+        y: H + 10,
+        vx: (Math.random() - 0.5) * 0.6,
+        vy: -(0.4 + Math.random() * 0.8),
+        size: 2 + Math.random() * 3.5,
+        alpha: 0.7 + Math.random() * 0.3,
+        phase: Math.random() * Math.PI * 2,
+        trail: []
+      });
+    }
+
+    // Actualizar estrellas fugaces
+    for (let s = shootingStars.length - 1; s >= 0; s--) {
+      const st = shootingStars[s];
+      st.line.position.x += st.vx;
+      st.line.position.y += st.vy;
+      st.life -= dt * 0.9;
+      st.line.material.opacity = Math.max(0, st.life);
+      if (st.life <= 0) {
+        scene.remove(st.line);
+        shootingStars.splice(s, 1);
+      }
+    }
+
+    // Cámara suave y encuadre totalmente protegido
+    const bZ = (baseZ && !isNaN(baseZ)) ? baseZ : (mobile ? 28 : 22);
+    const zm = (zoom && !isNaN(zoom)) ? zoom : 1;
+    const ent = (enter && !isNaN(enter)) ? enter : 1;
+    const zPos = bZ * zm * (1 + (1 - ease(ent)) * .5);
+    camera.position.set(0, 0, isNaN(zPos) ? 26 : zPos);
+    camera.lookAt(0, 0, 0);
+    renderer.render(scene, camera);
+
+    // Render de lirios, frases flotantes, wish orbs y golden ripples
+    const hasContent = lilies.length || floatingTexts.length || wishOrbs.length || goldenRipples.length;
+    if (hasContent) {
+      lx.clearRect(0, 0, W, H);
+      
+      for (let i = lilies.length - 1; i >= 0; i--) {
+        if (!drawLily(lilies[i], now)) lilies.splice(i, 1);
+      }
+
+      for (let j = floatingTexts.length - 1; j >= 0; j--) {
+        if (!drawFloatingText(floatingTexts[j], now)) floatingTexts.splice(j, 1);
+      }
+
+      // Golden ripples (ondas expansivas doradas al tocar durante 11:11)
+      for (let k = goldenRipples.length - 1; k >= 0; k--) {
+        const rp = goldenRipples[k];
+        rp.r += 2.5;
+        rp.alpha *= 0.965;
+        
+        if (rp.alpha < 0.01) {
+          goldenRipples.splice(k, 1);
+          continue;
+        }
+        
+        lx.save();
+        lx.globalAlpha = rp.alpha;
+        lx.strokeStyle = '#ffd166';
+        lx.lineWidth = 2;
+        lx.shadowColor = '#f59e0b';
+        lx.shadowBlur = 15;
+        lx.beginPath();
+        lx.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2);
+        lx.stroke();
+        
+        // Segundo anillo más tenue y rosado
+        lx.globalAlpha = rp.alpha * 0.4;
+        lx.strokeStyle = '#f472b6';
+        lx.lineWidth = 1;
+        lx.beginPath();
+        lx.arc(rp.x, rp.y, rp.r * 0.65, 0, Math.PI * 2);
+        lx.stroke();
+        lx.restore();
+      }
+
+      // Wish orbs (luciérnagas doradas flotantes durante 11:11)
+      for (let w = wishOrbs.length - 1; w >= 0; w--) {
+        const orb = wishOrbs[w];
+        
+        // Movimiento flotante con ondulación suave
+        orb.phase += 0.025;
+        orb.x += orb.vx + Math.sin(orb.phase) * 0.4;
+        orb.y += orb.vy;
+        orb.alpha -= 0.002;
+        
+        // Guardar trail (estela)
+        orb.trail.push({ x: orb.x, y: orb.y });
+        if (orb.trail.length > 12) orb.trail.shift();
+        
+        if (orb.alpha <= 0 || orb.y < -20) {
+          wishOrbs.splice(w, 1);
+          continue;
+        }
+        
+        lx.save();
+        
+        // Dibujar estela
+        for (let ti = 0; ti < orb.trail.length; ti++) {
+          const tp = orb.trail[ti];
+          const trailAlpha = (ti / orb.trail.length) * orb.alpha * 0.35;
+          const trailSize = orb.size * (ti / orb.trail.length) * 0.5;
+          
+          lx.globalAlpha = trailAlpha;
+          lx.fillStyle = '#fcd34d';
+          lx.beginPath();
+          lx.arc(tp.x, tp.y, trailSize, 0, Math.PI * 2);
+          lx.fill();
+        }
+        
+        // Orbe principal con glow dorado
+        lx.globalAlpha = orb.alpha;
+        lx.shadowColor = '#f59e0b';
+        lx.shadowBlur = 18;
+        
+        const orbGrad = lx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, orb.size * 2.5);
+        orbGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+        orbGrad.addColorStop(0.3, 'rgba(253, 224, 71, 0.8)');
+        orbGrad.addColorStop(0.7, 'rgba(245, 158, 11, 0.35)');
+        orbGrad.addColorStop(1, 'rgba(245, 158, 11, 0)');
+        
+        lx.fillStyle = orbGrad;
+        lx.beginPath();
+        lx.arc(orb.x, orb.y, orb.size * 2.5, 0, Math.PI * 2);
+        lx.fill();
+        
+        // Centro brillante
+        lx.fillStyle = '#ffffff';
+        lx.beginPath();
+        lx.arc(orb.x, orb.y, orb.size * 0.5, 0, Math.PI * 2);
+        lx.fill();
+        
+        lx.restore();
+      }
+
+      if (!lilies.length && !floatingTexts.length && !wishOrbs.length && !goldenRipples.length) lx.clearRect(0, 0, W, H);
+    }
+  }
+
+  /* Reanudación garantizada al salir y volver de la pestaña o app */
+  function resumeApp() {
+    _contextLost = false;
+    last = performance.now();
+    resize();
+    if (ac && ac.state === 'suspended' && started) {
+      ac.resume().catch(() => {});
+    }
+    cancelAnimationFrame(_rafId);
+    _rafId = requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) resumeApp();
+  });
+  window.addEventListener('pageshow', resumeApp);
+  window.addEventListener('focus', resumeApp);
+  
+  _rafId = requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
