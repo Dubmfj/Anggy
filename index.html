@@ -251,7 +251,7 @@
   <p class="prompt">toca para entrar</p>
 </div>
 
-<div id="hint">toca cualquier punto para que florezca un lirio · arrastra suavemente para girar</div>
+<div id="hint">toca para que florezca un lirio · arrastra para girar · pellizca para acercar</div>
 
 <!-- Cartel Gigante Mágico 11:11 Dorado Armonioso -->
 <div id="overlay1111">
@@ -603,7 +603,7 @@
      - Tallo orgánico esbelto con curvatura y grosor natural
      ========================================================== */
   const lc = $('lily'), lx = lc.getContext('2d');
-  let W = 0, H = 0, baseZ = 20, zoom = 1, enter = 0, started = false;
+  let W = 0, H = 0, baseZ = 20, zoom = 1, targetZoom = 1, currentZoom = 1, enter = 0, started = false;
   const lilies = [];
   const floatingTexts = [];
   const wishOrbs = [];
@@ -999,6 +999,10 @@
   let isPointerDown = false;
   let lastX = 0, lastY = 0;
   let totalMoved = 0;
+  let wasPinching = false;
+  let initialPinchDist = 0;
+  let initialPinchZoom = 1;
+  const activeTouches = new Map();
   
   let targetRotY = 0;
   let targetRotX = mobile ? 0.82 : 0.60;
@@ -1007,14 +1011,42 @@
 
   window.addEventListener('pointerdown', e => {
     if (!started) return;
-    isPointerDown = true;
-    lastX = e.clientX;
-    lastY = e.clientY;
-    totalMoved = 0;
+    activeTouches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (activeTouches.size === 1) {
+      isPointerDown = true;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      totalMoved = 0;
+      wasPinching = false;
+    } else if (activeTouches.size === 2) {
+      // Inicia pellizco táctil de dos dedos (pinch-to-zoom)
+      wasPinching = true;
+      isPointerDown = false;
+      const pts = Array.from(activeTouches.values());
+      initialPinchDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+      initialPinchZoom = targetZoom;
+    }
   });
 
   window.addEventListener('pointermove', e => {
-    if (!isPointerDown) return;
+    if (!activeTouches.has(e.pointerId)) return;
+    activeTouches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (activeTouches.size >= 2) {
+      // Zoom multitáctil fluido en celulares y tablets
+      const pts = Array.from(activeTouches.values());
+      const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+      if (initialPinchDist > 8 && dist > 8) {
+        // Separar dedos (dist > initial) reduce targetZoom para acercar la cámara
+        const ratio = initialPinchDist / dist;
+        targetZoom = clamp(initialPinchZoom * ratio, 0.30, 2.2);
+        zoom = targetZoom;
+      }
+      return;
+    }
+
+    if (!isPointerDown || wasPinching) return;
     if (e.buttons === 0 && e.pointerType === 'mouse') {
       isPointerDown = false;
       return;
@@ -1032,18 +1064,43 @@
   });
 
   const stopPointer = e => {
-    if (!isPointerDown) return;
-    isPointerDown = false;
-    
-    if (totalMoved < 9 && e) {
-      spawnLily(e.clientX, e.clientY);
+    activeTouches.delete(e.pointerId);
+
+    if (activeTouches.size === 0) {
+      if (isPointerDown && !wasPinching && totalMoved < 9 && e) {
+        spawnLily(e.clientX, e.clientY);
+      }
+      isPointerDown = false;
+      wasPinching = false;
+      totalMoved = 0;
+    } else if (activeTouches.size === 1) {
+      // Queda un solo dedo tras el pellizco: no crear lirio ni saltar bruscamente
+      const remaining = Array.from(activeTouches.values())[0];
+      lastX = remaining.x;
+      lastY = remaining.y;
+      totalMoved = 999;
     }
   };
 
   window.addEventListener('pointerup', stopPointer);
-  window.addEventListener('pointercancel', () => { isPointerDown = false; });
-  window.addEventListener('blur', () => { isPointerDown = false; });
-  window.addEventListener('wheel', e => { zoom = clamp(zoom * (1 + e.deltaY * .0008), .55, 1.5); }, { passive: true });
+  window.addEventListener('pointercancel', e => { 
+    activeTouches.delete(e.pointerId);
+    if (activeTouches.size === 0) {
+      isPointerDown = false; 
+      wasPinching = false;
+    }
+  });
+  window.addEventListener('blur', () => { 
+    activeTouches.clear();
+    isPointerDown = false; 
+    wasPinching = false;
+  });
+
+  // Zoom con rueda de ratón en PC (ultrasuave con lerp)
+  window.addEventListener('wheel', e => { 
+    targetZoom = clamp(targetZoom * (1 + e.deltaY * 0.0008), 0.30, 2.2); 
+    zoom = targetZoom;
+  }, { passive: true });
 
   // Entrada con GSAP
   $('intro').addEventListener('pointerup', () => {
@@ -1141,9 +1198,13 @@
       }
     }
 
+    // Interpolación ultrasuave del zoom (slow motion cinemático tanto para móvil como para PC)
+    currentZoom += (targetZoom - currentZoom) * 0.08;
+    zoom = currentZoom;
+
     // Cámara suave y encuadre totalmente protegido
     const bZ = (baseZ && !isNaN(baseZ)) ? baseZ : (mobile ? 28 : 22);
-    const zm = (zoom && !isNaN(zoom)) ? zoom : 1;
+    const zm = (currentZoom && !isNaN(currentZoom)) ? currentZoom : 1;
     const ent = (enter && !isNaN(enter)) ? enter : 1;
     const zPos = bZ * zm * (1 + (1 - ease(ent)) * .5);
     camera.position.set(0, 0, isNaN(zPos) ? 26 : zPos);
