@@ -1102,8 +1102,25 @@
     zoom = targetZoom;
   }, { passive: true });
 
+  /* ---- Aviso cuando alguien entra con un link etiquetado ---- */
+  const NTFY_TOPIC = 'anggy-regalo-1111';
+  function avisarEntrada() {
+    const quien = new URLSearchParams(location.search).get('de');
+    if (!quien) return;                        // sin etiqueta: no avisa
+    try {
+      if (sessionStorage.getItem('avisado')) return;   // un solo aviso por visita
+      sessionStorage.setItem('avisado', '1');
+    } catch (e) {}
+    fetch('https://ntfy.sh/' + NTFY_TOPIC, {
+      method: 'POST',
+      body: quien + ' abrió tu regalo 🌸 ' + new Date().toLocaleTimeString('es-PE'),
+      keepalive: true
+    }).catch(() => {});
+  }
+
   // Entrada con GSAP
   $('intro').addEventListener('pointerup', () => {
+    avisarEntrada();
     initAudio(); 
     if (ac && ac.state === 'suspended') ac.resume();
     started = true; 
