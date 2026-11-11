@@ -54,6 +54,8 @@
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     cursor: pointer;
+    touch-action: manipulation;
+    pointer-events: auto;
   }
   
   #intro h1 {
@@ -1647,37 +1649,80 @@
   /* ---- Aviso cuando alguien entra con un link etiquetado ---- */
   const NTFY_TOPIC = 'anggy-regalo-1111';
   function avisarEntrada() {
-    const quien = new URLSearchParams(location.search).get('de');
-    if (!quien) return;                        // sin etiqueta: no avisa
     try {
+      const quien = new URLSearchParams(location.search).get('de');
+      if (!quien) return;                        // sin etiqueta: no avisa
       if (sessionStorage.getItem('avisado')) return;   // un solo aviso por visita
       sessionStorage.setItem('avisado', '1');
+      fetch('https://ntfy.sh/' + NTFY_TOPIC, {
+        method: 'POST',
+        body: quien + ' abrió tu regalo 🌸 ' + new Date().toLocaleTimeString('es-PE'),
+        keepalive: true
+      }).catch(() => {});
     } catch (e) {}
-    fetch('https://ntfy.sh/' + NTFY_TOPIC, {
-      method: 'POST',
-      body: quien + ' abrió tu regalo 🌸 ' + new Date().toLocaleTimeString('es-PE'),
-      keepalive: true
-    }).catch(() => {});
   }
 
-  // Entrada con GSAP
-  $('intro').addEventListener('pointerup', () => {
-    avisarEntrada();
-    initAudio(); 
-    if (ac && ac.state === 'suspended') ac.resume();
-    started = true; 
-    
-    gsap.to('#intro', {
-      opacity: 0,
-      duration: 1.6,
-      ease: "power2.out",
-      onComplete: () => {
-        $('intro').style.display = 'none';
-        $('hint').classList.add('on');
-        setTimeout(() => $('hint').classList.remove('on'), 8500);
+  // Entrada robusta y garantizada para cualquier dispositivo y navegador
+  let introDismissed = false;
+  function enterExperience() {
+    if (introDismissed) return;
+    introDismissed = true;
+    started = true;
+
+    // Aviso ntfy protegido (no bloquea si falla la red)
+    try { avisarEntrada(); } catch (e) {}
+
+    // Audio celestial protegido
+    try {
+      initAudio();
+      if (ac && ac.state === 'suspended') ac.resume().catch(() => {});
+    } catch (e) {}
+
+    // Visibilidad del botón de deseo
+    try {
+      if (typeof updateWishBtnVisibility === 'function') updateWishBtnVisibility();
+    } catch (e) {}
+
+    const introEl = $('intro');
+    if (introEl) {
+      introEl.style.pointerEvents = 'none'; // Desactivar clics en intro inmediatamente
+
+      if (window.gsap && typeof gsap.to === 'function') {
+        gsap.to(introEl, {
+          opacity: 0,
+          duration: 1.4,
+          ease: "power2.out",
+          onComplete: () => {
+            introEl.style.display = 'none';
+            const hint = $('hint');
+            if (hint) {
+              hint.classList.add('on');
+              setTimeout(() => hint.classList.remove('on'), 8500);
+            }
+          }
+        });
+      } else {
+        // Fallback nativo inmediato si GSAP no está disponible
+        introEl.style.transition = 'opacity 1.4s ease';
+        introEl.style.opacity = '0';
+        setTimeout(() => {
+          introEl.style.display = 'none';
+          const hint = $('hint');
+          if (hint) {
+            hint.classList.add('on');
+            setTimeout(() => hint.classList.remove('on'), 8500);
+          }
+        }, 1400);
       }
+    }
+  }
+
+  const introElement = $('intro');
+  if (introElement) {
+    ['pointerup', 'click', 'touchend'].forEach(evtType => {
+      introElement.addEventListener(evtType, enterExperience, { passive: true });
     });
-  });
+  }
 
   /* ==========================================================
      7. BUCLE PRINCIPAL (SLOW MOTION, ELEGANTE Y REALISTA A 60 FPS)
