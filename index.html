@@ -615,15 +615,15 @@
   }
   #countdown1111.on { opacity: 1; }
 
-  /* ========== FLASH DORADO ========== */
+  /* ========== DESTELLO DORADO Y ROSA SUAVE ========== */
   #flash1111 {
     position: fixed;
     inset: 0;
     z-index: 15;
-    background: radial-gradient(circle, rgba(255,241,186,0.85), rgba(251,191,36,0.5) 50%, transparent 80%);
+    background: radial-gradient(circle at 50% 50%, rgba(255, 248, 220, 0.45) 0%, rgba(251, 191, 36, 0.22) 45%, rgba(244, 114, 182, 0.12) 70%, transparent 100%);
     opacity: 0;
     pointer-events: none;
-    transition: opacity .15s ease;
+    transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
   #flash1111.on { opacity: 1; }
 </style>
@@ -1505,46 +1505,88 @@
     }
   }
 
+  // Dispara el efecto visual y sonoro suave de transición al 11:11
+  function trigger1111Explosion() {
+    // Destello dorado suave, cálido y celestial (no invasivo)
+    if (flashEl) {
+      flashEl.classList.add('on');
+      setTimeout(() => flashEl.classList.remove('on'), 1500);
+    }
+
+    // Ráfaga de estrellas fugaces doradas
+    for (let k = 0; k < 10; k++) {
+      setTimeout(() => createShootingStar(true), k * 200);
+    }
+
+    // Arpegio de campanitas celestiales suaves
+    for (let k = 0; k < 8; k++) {
+      setTimeout(() => bell(), k * 160);
+    }
+
+    // Vibración suave si está disponible
+    try { if (navigator.vibrate) navigator.vibrate([150, 80, 150]); } catch (e) {}
+  }
+
+  // Activa el momento 11:11 completo (cartel gigante, mensajes, rotación y brillo)
+  function activate1111(forced = false) {
+    if (forced) window.__force1111 = true;
+    if (!is1111Active) {
+      is1111Active = true;
+      galaxySpeedMult = 3;          // 3× más rápido
+      if (overlay1111) overlay1111.classList.add('active');
+
+      if (msgEl) {
+        msgEl.textContent = 'Que este 11:11 te regale todo lo bonito que mereces ✦';
+        msgEl.classList.add('on');
+      }
+
+      bell();
+      for (let k = 0; k < 8; k++) {
+        setTimeout(() => { createShootingStar(true); bell(); }, k * 450);
+      }
+    }
+    updateWishBtnVisibility();
+  }
+
+  // Desactiva el momento 11:11 con transición suave
+  function deactivate1111() {
+    window.__force1111 = false;
+    is1111Active = false;
+    galaxySpeedMult = 1;
+    if (overlay1111) overlay1111.classList.remove('active');
+
+    if (msgEl) {
+      msgEl.textContent = 'Tu deseo ya viajó ✦';
+      setTimeout(() => {
+        if (!is1111Active && msgEl) msgEl.classList.remove('on');
+      }, 4000);
+    }
+    updateWishBtnVisibility();
+  }
+
   // Cuenta regresiva de 10 segundos antes del minuto 11:11
-  function startCountdown() {
+  function startCountdown(isSim = false) {
     if (countdownRunning) return;
     countdownRunning = true;
     let sec = 10;
-    countdownEl.textContent = sec;
-    countdownEl.classList.add('on');
+    if (countdownEl) {
+      countdownEl.textContent = sec;
+      countdownEl.classList.add('on');
+    }
 
     const cid = setInterval(() => {
       sec--;
       if (sec <= 0) {
         clearInterval(cid);
-        countdownEl.classList.remove('on');
+        if (countdownEl) countdownEl.classList.remove('on');
         countdownRunning = false;
         trigger1111Explosion();
+        // Activa el cartel gigante 11:11, la aurora y toda la experiencia
+        activate1111(isSim);
         return;
       }
-      countdownEl.textContent = sec;
+      if (countdownEl) countdownEl.textContent = sec;
     }, 1000);
-  }
-
-  // Explosión de luz dorada al iniciar el minuto 11:11
-  function trigger1111Explosion() {
-    // Flash visual dorado
-    flashEl.classList.add('on');
-    setTimeout(() => flashEl.classList.remove('on'), 350);
-    setTimeout(() => { flashEl.classList.add('on'); setTimeout(() => flashEl.classList.remove('on'), 200); }, 500);
-
-    // Ráfaga de estrellas fugaces doradas
-    for (let k = 0; k < 12; k++) {
-      setTimeout(() => createShootingStar(true), k * 180);
-    }
-
-    // Arpegio de 8 campanitas
-    for (let k = 0; k < 8; k++) {
-      setTimeout(() => bell(), k * 140);
-    }
-
-    // Vibración si está disponible
-    try { if (navigator.vibrate) navigator.vibrate([200, 100, 200]); } catch (e) {}
   }
 
   function check1111() {
@@ -1555,53 +1597,31 @@
 
     const activeNow = isSpecialMinute();
 
-    // Cuenta regresiva en los últimos 10 segundos antes del 11:11
-    if (!is1111Active && !countdownRunning) {
+    // Cuenta regresiva en los últimos 10 segundos antes del 11:11 real
+    if (!is1111Active && !countdownRunning && !window.__force1111) {
       const is10Before = ((h === 11 || h === 23) && m === 10 && s >= 50) || forced1111;
-      if (is10Before && !forced1111) startCountdown();
-      if (forced1111 && !is1111Active) trigger1111Explosion();
+      if (is10Before && !forced1111) startCountdown(false);
+      if (forced1111 && !is1111Active) {
+        trigger1111Explosion();
+        activate1111(true);
+      }
     }
 
     if (activeNow || window.__force1111) {
       if (!is1111Active) {
-        is1111Active = true;
-        galaxySpeedMult = 3;          // 3× más rápido
-        overlay1111.classList.add('active');
-
-        // Mensaje especial
-        if (msgEl) {
-          msgEl.textContent = 'Que este 11:11 te regale todo lo bonito que mereces ✦';
-          msgEl.classList.add('on');
-        }
-
-        bell();
-        for (let k = 0; k < 8; k++) {
-          setTimeout(() => { createShootingStar(true); bell(); }, k * 450);
-        }
+        activate1111(false);
       }
       // Barra de tiempo
       const sec = window.__force1111 ? (Math.floor(Date.now() / 1000) % 60) : now.getSeconds();
       const bar = $('timelineBar1111');
       if (bar) bar.style.width = ((sec / 60) * 100) + '%';
 
-      // Botón brilla dorado durante 11:11
       updateWishBtnVisibility();
 
     } else if (!activeNow && !window.__force1111 && is1111Active) {
-      is1111Active = false;
-      galaxySpeedMult = 1;
-      overlay1111.classList.remove('active');
-
-      // Transición suave al terminar
-      if (msgEl) {
-        msgEl.textContent = 'Tu deseo ya viajó ✦';
-        setTimeout(() => msgEl.classList.remove('on'), 4000);
-      }
-
-      updateWishBtnVisibility();
+      deactivate1111();
     }
 
-    // Actualizar visibilidad del botón de deseo
     updateWishBtnVisibility();
   }
 
@@ -1609,29 +1629,19 @@
   check1111();
 
   window.test1111 = (force = true) => {
-    window.__force1111 = force;
-    is1111Active = force;
     if (force) {
-      galaxySpeedMult = 3;
-      overlay1111.classList.add('active');
       trigger1111Explosion();
-      if (msgEl) {
-        msgEl.textContent = 'Que este 11:11 te regale todo lo bonito que mereces ✦';
-        msgEl.classList.add('on');
-      }
+      activate1111(true);
     } else {
-      galaxySpeedMult = 1;
-      overlay1111.classList.remove('active');
-      if (msgEl) msgEl.classList.remove('on');
+      deactivate1111();
     }
-    updateWishBtnVisibility();
   };
 
-  // Prueba con cuenta regresiva completa: testCountdown()
+  // Prueba con cuenta regresiva completa de 10 segundos + entra al 11:11 completo
   window.testCountdown = () => {
+    deactivate1111();
     countdownRunning = false;
-    is1111Active = false;
-    startCountdown();
+    startCountdown(true);
   };
 
   window.testDia = (force = true) => {
