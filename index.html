@@ -497,7 +497,7 @@
 
   // Detecta si es el día 11 de noviembre (mes base‑0 = 10) o está forzado
   function isSpecialDay() {
-    if (forcedDay) return true;
+    if (forcedDay || window.__forceDia) return true;
     const d = new Date();
     return d.getMonth() === 10 && d.getDate() === 11; // noviembre
   }
@@ -1386,10 +1386,22 @@
       galaxySpeedMult = 3;
       overlay1111.classList.add('active');
       trigger1111Explosion();
+      if (msgEl) {
+        msgEl.textContent = 'Que este 11:11 te regale todo lo bonito que mereces ✦';
+        msgEl.classList.add('on');
+      }
     } else {
       galaxySpeedMult = 1;
       overlay1111.classList.remove('active');
+      if (msgEl) msgEl.classList.remove('on');
     }
+    updateWishBtnVisibility();
+  };
+
+  window.testDia = (force = true) => {
+    window.__forceDia = force;
+    updateWishBtnVisibility();
+    console.log(force ? '✦ MODO DÍA 11/11 ACTIVADO' : 'Modo día normal');
   };
 
   /* ==========================================================
