@@ -1627,6 +1627,13 @@
     updateWishBtnVisibility();
   };
 
+  // Prueba con cuenta regresiva completa: testCountdown()
+  window.testCountdown = () => {
+    countdownRunning = false;
+    is1111Active = false;
+    startCountdown();
+  };
+
   window.testDia = (force = true) => {
     window.__forceDia = force;
     updateWishBtnVisibility();
@@ -2347,12 +2354,9 @@
           continue;
         }
         
-        lx.save();
         lx.globalAlpha = rp.alpha;
         lx.strokeStyle = '#ffd166';
         lx.lineWidth = 2;
-        lx.shadowColor = '#f59e0b';
-        lx.shadowBlur = 15;
         lx.beginPath();
         lx.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2);
         lx.stroke();
@@ -2364,10 +2368,13 @@
         lx.beginPath();
         lx.arc(rp.x, rp.y, rp.r * 0.65, 0, Math.PI * 2);
         lx.stroke();
-        lx.restore();
       }
 
       // ★ Chispas doradas (goldenSparks) — día 11/11
+      // Agrupar sin shadow para rendimiento
+      lx.save();
+      lx.shadowColor = 'transparent';
+      lx.shadowBlur = 0;
       for (let s = goldenSparks.length - 1; s >= 0; s--) {
         const sp = goldenSparks[s];
         sp.x += sp.vx;
@@ -2380,18 +2387,15 @@
           continue;
         }
 
-        lx.save();
         lx.globalAlpha = sp.life;
-        lx.shadowColor = '#fbbf24';
-        lx.shadowBlur = 10;
         lx.fillStyle = sp.life > 0.5 ? '#fff9db' : '#fcd34d';
         lx.beginPath();
         lx.arc(sp.x, sp.y, sp.size * sp.life, 0, Math.PI * 2);
         lx.fill();
-        lx.restore();
       }
+      lx.restore();
 
-      // ★ Esferas de deseos dorados (goldenWishes)
+      // ★ Esferas de deseos dorados (goldenWishes) — optimizado sin shadowBlur
       for (let gw = goldenWishes.length - 1; gw >= 0; gw--) {
         const w = goldenWishes[gw];
 
@@ -2400,15 +2404,15 @@
           w.phase += 0.04;
           w.x += w.vx + Math.sin(w.phase) * 0.6;
           w.y += w.vy;
-          // Estela de polvo de estrellas mientras sube
-          if (Math.random() < 0.4) {
+          // Estela de polvo (reducida para rendimiento)
+          if (Math.random() < 0.25) {
             goldenSparks.push({
               x: w.x + (Math.random() - 0.5) * 6,
               y: w.y + 4,
-              vx: (Math.random() - 0.5) * 1.2,
-              vy: 0.3 + Math.random() * 0.5,
-              size: 1 + Math.random() * 1.5,
-              life: 0.6
+              vx: (Math.random() - 0.5) * 1.0,
+              vy: 0.3 + Math.random() * 0.4,
+              size: 1 + Math.random() * 1.2,
+              life: 0.5
             });
           }
           if (w.y <= w.targetY) {
@@ -2423,50 +2427,45 @@
           w.y += Math.cos(w.phase * 0.7) * 0.06;
         }
 
-        // Dibujar la estrella (dorada o rosa/blanco si cumplido)
-        lx.save();
+        // Dibujar la estrella (sin shadowBlur para rendimiento)
         const twinkle = 0.75 + Math.sin(now / 300 + w.phase) * 0.25;
-        lx.globalAlpha = w.alpha * twinkle;
+        const baseAlpha = w.alpha * twinkle;
 
         if (w.done) {
-          // Deseo cumplido: resplandor rosa y blanco celestial
-          lx.shadowColor = '#f472b6';
-          lx.shadowBlur = 22;
-
-          const pGrad = lx.createRadialGradient(w.x, w.y, 0, w.x, w.y, w.size * 3.2);
-          pGrad.addColorStop(0, 'rgba(255,255,255,0.98)');
-          pGrad.addColorStop(0.3, 'rgba(244,114,182,0.9)');
-          pGrad.addColorStop(0.65, 'rgba(236,72,153,0.45)');
-          pGrad.addColorStop(1, 'rgba(219,39,119,0)');
-          lx.fillStyle = pGrad;
+          // Deseo cumplido: halo rosa suave
+          lx.globalAlpha = baseAlpha * 0.5;
+          lx.fillStyle = 'rgba(244,114,182,0.35)';
           lx.beginPath();
           lx.arc(w.x, w.y, w.size * 3.2, 0, Math.PI * 2);
           lx.fill();
-
-          // Centro blanco-rosado brillante
+          // Centro brillante rosa
+          lx.globalAlpha = baseAlpha;
+          lx.fillStyle = '#fce7f3';
+          lx.beginPath();
+          lx.arc(w.x, w.y, w.size * 1.1, 0, Math.PI * 2);
+          lx.fill();
           lx.fillStyle = '#fff0f6';
           lx.beginPath();
-          lx.arc(w.x, w.y, w.size * 0.65, 0, Math.PI * 2);
+          lx.arc(w.x, w.y, w.size * 0.55, 0, Math.PI * 2);
           lx.fill();
         } else {
-          // Deseo normal: esfera dorada resplandeciente
-          lx.shadowColor = '#fbbf24';
-          lx.shadowBlur = 20;
-
-          const wGrad = lx.createRadialGradient(w.x, w.y, 0, w.x, w.y, w.size * 3);
-          wGrad.addColorStop(0, 'rgba(255,255,255,0.95)');
-          wGrad.addColorStop(0.25, 'rgba(253,224,71,0.85)');
-          wGrad.addColorStop(0.6, 'rgba(251,191,36,0.4)');
-          wGrad.addColorStop(1, 'rgba(245,158,11,0)');
-          lx.fillStyle = wGrad;
+          // Deseo normal: halo dorado suave
+          lx.globalAlpha = baseAlpha * 0.45;
+          lx.fillStyle = 'rgba(251,191,36,0.35)';
           lx.beginPath();
           lx.arc(w.x, w.y, w.size * 3, 0, Math.PI * 2);
           lx.fill();
-
+          // Anillo medio
+          lx.globalAlpha = baseAlpha * 0.7;
+          lx.fillStyle = 'rgba(253,224,71,0.6)';
+          lx.beginPath();
+          lx.arc(w.x, w.y, w.size * 1.5, 0, Math.PI * 2);
+          lx.fill();
           // Centro blanco brillante
+          lx.globalAlpha = baseAlpha;
           lx.fillStyle = '#fffef5';
           lx.beginPath();
-          lx.arc(w.x, w.y, w.size * 0.6, 0, Math.PI * 2);
+          lx.arc(w.x, w.y, w.size * 0.55, 0, Math.PI * 2);
           lx.fill();
         }
 
@@ -2482,13 +2481,9 @@
             lx.textAlign = 'center';
             lx.textBaseline = 'bottom';
             if (w.done) {
-              lx.shadowColor = 'rgba(244,114,182,0.95)';
-              lx.shadowBlur = 14;
               lx.fillStyle = '#fce7f3';
               lx.fillText('✓ ' + w.text, w.x, w.y - w.size * 3.5);
             } else {
-              lx.shadowColor = 'rgba(251,191,36,0.9)';
-              lx.shadowBlur = 12;
               lx.fillStyle = '#fef3c7';
               lx.fillText(w.text, w.x, w.y - w.size * 3.5);
             }
@@ -2496,10 +2491,9 @@
             w.showText = 0;
           }
         }
-        lx.restore();
       }
 
-      // Wish orbs (luciérnagas doradas flotantes durante 11:11)
+      // Wish orbs (luciérnagas doradas flotantes durante 11:11) — optimizado
       for (let w = wishOrbs.length - 1; w >= 0; w--) {
         const orb = wishOrbs[w];
         
@@ -2509,19 +2503,18 @@
         orb.alpha -= 0.002;
         
         orb.trail.push({ x: orb.x, y: orb.y });
-        if (orb.trail.length > 12) orb.trail.shift();
+        if (orb.trail.length > 8) orb.trail.shift();
         
         if (orb.alpha <= 0 || orb.y < -20) {
           wishOrbs.splice(w, 1);
           continue;
         }
         
-        lx.save();
-        
+        // Estela simplificada (sin shadow)
         for (let ti = 0; ti < orb.trail.length; ti++) {
           const tp = orb.trail[ti];
-          const trailAlpha = (ti / orb.trail.length) * orb.alpha * 0.35;
-          const trailSize = orb.size * (ti / orb.trail.length) * 0.5;
+          const trailAlpha = (ti / orb.trail.length) * orb.alpha * 0.3;
+          const trailSize = orb.size * (ti / orb.trail.length) * 0.4;
           
           lx.globalAlpha = trailAlpha;
           lx.fillStyle = '#fcd34d';
@@ -2530,27 +2523,18 @@
           lx.fill();
         }
         
-        lx.globalAlpha = orb.alpha;
-        lx.shadowColor = '#f59e0b';
-        lx.shadowBlur = 18;
-        
-        const orbGrad = lx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, orb.size * 2.5);
-        orbGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
-        orbGrad.addColorStop(0.3, 'rgba(253, 224, 71, 0.8)');
-        orbGrad.addColorStop(0.7, 'rgba(245, 158, 11, 0.35)');
-        orbGrad.addColorStop(1, 'rgba(245, 158, 11, 0)');
-        
-        lx.fillStyle = orbGrad;
+        // Orbe principal (halo + centro, sin gradient ni shadow)
+        lx.globalAlpha = orb.alpha * 0.4;
+        lx.fillStyle = 'rgba(253,224,71,0.5)';
         lx.beginPath();
-        lx.arc(orb.x, orb.y, orb.size * 2.5, 0, Math.PI * 2);
+        lx.arc(orb.x, orb.y, orb.size * 2.2, 0, Math.PI * 2);
         lx.fill();
-        
+
+        lx.globalAlpha = orb.alpha;
         lx.fillStyle = '#ffffff';
         lx.beginPath();
         lx.arc(orb.x, orb.y, orb.size * 0.5, 0, Math.PI * 2);
         lx.fill();
-        
-        lx.restore();
       }
 
       if (!lilies.length && !floatingTexts.length && !wishOrbs.length && !goldenRipples.length && !goldenSparks.length && !goldenWishes.length) lx.clearRect(0, 0, W, H);
