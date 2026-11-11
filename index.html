@@ -238,6 +238,208 @@
     from { transform: scale(0.97); filter: drop-shadow(0 0 30px rgba(245, 158, 11, 0.6)); }
     to { transform: scale(1.03); filter: drop-shadow(0 0 60px rgba(251, 191, 36, 0.9)); }
   }
+
+  /* ========== BOTÓN "PIDE UN DESEO" ========== */
+  #wishBtn {
+    position: fixed;
+    bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9;
+    display: none;                      /* oculto por defecto */
+    align-items: center;
+    gap: 6px;
+    padding: 10px 22px;
+    border: 1px solid rgba(251,191,36,0.45);
+    border-radius: 28px;
+    background: rgba(10,5,18,0.65);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    cursor: pointer;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-size: clamp(15px, 3.8vw, 18px);
+    color: #fef3c7;
+    text-shadow: 0 0 12px rgba(251,191,36,0.7);
+    box-shadow: 0 0 18px rgba(251,191,36,0.25), inset 0 0 12px rgba(244,114,182,0.12);
+    animation: wishBeat 2.4s ease-in-out infinite;
+    transition: box-shadow .4s, border-color .4s;
+  }
+  #wishBtn .star-icon {
+    display: inline-block;
+    animation: starPulse 1.6s ease-in-out infinite;
+  }
+  #wishBtn.gold {
+    border-color: #fbbf24;
+    box-shadow: 0 0 30px rgba(251,191,36,0.6), 0 0 60px rgba(245,158,11,0.3), inset 0 0 15px rgba(251,191,36,0.2);
+    color: #fff;
+  }
+  @keyframes wishBeat {
+    0%, 100% { transform: translateX(-50%) scale(1); }
+    50%      { transform: translateX(-50%) scale(1.06); }
+  }
+  @keyframes starPulse {
+    0%, 100% { opacity: .7; transform: scale(1); }
+    50%      { opacity: 1;  transform: scale(1.25); }
+  }
+
+  /* ========== MODAL GLASSMORPHISM DEL DESEO ========== */
+  #wishOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 12;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: opacity .45s ease;
+  }
+  #wishOverlay.open {
+    display: flex;
+    animation: fadeInModal .45s ease;
+  }
+  @keyframes fadeInModal {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  .wish-card {
+    position: relative;
+    width: min(340px, 88vw);
+    padding: 28px 24px 22px;
+    border-radius: 22px;
+    background: rgba(16,10,28,0.82);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(244,114,182,0.35);
+    box-shadow:
+      0 0 28px rgba(244,114,182,0.18),
+      0 0 48px rgba(251,191,36,0.12),
+      inset 0 0 20px rgba(186,230,253,0.06);
+    text-align: center;
+    animation: cardIn .5s cubic-bezier(.16,1,.3,1);
+  }
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(30px) scale(.94); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .wish-card h2 {
+    margin: 0 0 16px;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(20px, 5vw, 26px);
+    background: linear-gradient(135deg, #fff 20%, #ffd4e8 50%, #fef3c7 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .wish-card input {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 17px;               /* ≥16px → iOS no hace zoom */
+    color: #fff;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    outline: none;
+    transition: border-color .3s;
+  }
+  .wish-card input:focus {
+    border-color: rgba(251,191,36,0.6);
+  }
+  .wish-card input::placeholder {
+    color: rgba(255,255,255,0.35);
+    font-style: italic;
+  }
+  .wish-card button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 14px;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: clamp(15px, 3.8vw, 17px);
+    color: #1a0a2e;
+    background: linear-gradient(90deg, #f9a8d4, #93c5fd, #fcd34d);
+    cursor: pointer;
+    box-shadow: 0 4px 18px rgba(244,114,182,0.3);
+    transition: transform .2s, box-shadow .2s;
+  }
+  .wish-card button:active {
+    transform: scale(.97);
+  }
+  .wish-card .wish-close {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.45);
+    font-size: 22px;
+    cursor: pointer;
+    width: auto;
+    padding: 4px;
+    box-shadow: none;
+  }
+
+  /* ========== MENSAJE 11:11 REFORZADO ========== */
+  #msg1111 {
+    position: fixed;
+    bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+    left: 0; right: 0;
+    z-index: 8;
+    text-align: center;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-size: clamp(16px, 4vw, 22px);
+    color: #fef3c7;
+    text-shadow: 0 0 20px rgba(251,191,36,0.8), 0 0 40px rgba(245,158,11,0.5);
+    opacity: 0;
+    transition: opacity 1.5s ease;
+    pointer-events: none;
+    padding: 0 24px;
+  }
+  #msg1111.on { opacity: 1; }
+
+  /* ========== CUENTA REGRESIVA 11:11 ========== */
+  #countdown1111 {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: clamp(72px, 22vw, 160px);
+    background: linear-gradient(135deg, #fff 0%, #fcd34d 60%, #f59e0b 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 50px rgba(251,191,36,0.7);
+    opacity: 0;
+    transition: opacity .6s ease;
+    pointer-events: none;
+  }
+  #countdown1111.on { opacity: 1; }
+
+  /* ========== FLASH DORADO ========== */
+  #flash1111 {
+    position: fixed;
+    inset: 0;
+    z-index: 15;
+    background: radial-gradient(circle, rgba(255,241,186,0.85), rgba(251,191,36,0.5) 50%, transparent 80%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .15s ease;
+  }
+  #flash1111.on { opacity: 1; }
 </style>
 </head>
 <body>
@@ -246,8 +448,8 @@
 
 <!-- Pantalla de Bienvenida y Dedicatoria -->
 <div id="intro">
-  <h1>Para ti</h1>
-  <p class="dedication">Velo cuando te sientas triste, o tal vez cuando quieras ver algo bonito.</p>
+  <h1 id="introTitle">Para ti</h1>
+  <p class="dedication" id="introDedication">Velo cuando te sientas triste, o tal vez cuando quieras ver algo bonito.</p>
   <p class="prompt">toca para entrar</p>
 </div>
 
@@ -262,10 +464,51 @@
   <div class="timeline-1111"><div class="timeline-bar-1111" id="timelineBar1111"></div></div>
 </div>
 
+<!-- Botón "pide un deseo" (solo día 11/11) -->
+<div id="wishBtn"><span class="star-icon">✦</span> pide un deseo</div>
+
+<!-- Modal glassmorphism del deseo -->
+<div id="wishOverlay">
+  <div class="wish-card">
+    <button class="wish-close" id="wishClose">✕</button>
+    <h2>Escribe tu deseo ✦</h2>
+    <input id="wishInput" type="text" placeholder="Lo que quieras pedir…" maxlength="200" autocomplete="off" />
+    <button id="wishSend">Enviar a las estrellas ✦</button>
+  </div>
+</div>
+
+<!-- Cuenta regresiva y flash para 11:11 reforzado -->
+<div id="countdown1111"></div>
+<div id="flash1111"></div>
+<div id="msg1111"></div>
+
 <script>
 (() => {
   const $ = id => document.getElementById(id);
   const mobile = matchMedia('(pointer:coarse)').matches || innerWidth < 700;
+
+  // ---------- MODO ESPECIAL ----------
+  // Parámetros de simulación por URL
+  const urlParams = new URLSearchParams(location.search);
+  const forcedDay = urlParams.has('sim') && urlParams.get('sim') === 'dia'; // fuerza modo 11/11
+  const forced1111 = urlParams.has('sim') && urlParams.get('sim') === '1111'; // fuerza minuto 11:11
+
+  // Detecta si es el día 11 de noviembre (mes base‑0 = 10) o está forzado
+  function isSpecialDay() {
+    if (forcedDay) return true;
+    const d = new Date();
+    return d.getMonth() === 10 && d.getDate() === 11; // noviembre
+  }
+
+  // Detecta si es exactamente 11:11 (am o pm) o está forzado
+  function isSpecialMinute() {
+    if (forced1111) return true;
+    const d = new Date();
+    const h = d.getHours();
+    const m = d.getMinutes();
+    return (h === 11 || h === 23) && m === 11;
+  }
+
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const ease = t => 1 - Math.pow(1 - t, 3);
 
@@ -308,6 +551,20 @@
     'Una persona única',
     '✦ 11:11 ✦'
   ];
+
+  /* ========== FRASES ESPECIALES DÍA 11/11 ========== */
+  if (isSpecialDay()) {
+    PHRASES.push('¡Es hoy, es hoy!', 'Pide un deseo ✦', '11/11 ✦', 'Tu día especial ✦');
+    FLOWER_WHISPERS.push('¡Es hoy, es hoy!', 'Pide un deseo ✦', '11/11 ✦', 'Hoy todo es posible ✦', 'Cierra los ojos y pide ✦');
+  }
+
+  /* ========== INTRO ESPECIAL DÍA 11/11 ========== */
+  if (isSpecialDay()) {
+    const titleEl = document.getElementById('introTitle');
+    const dedicEl = document.getElementById('introDedication');
+    if (titleEl) titleEl.textContent = 'Hoy es 11/11 ✦';
+    if (dedicEl) dedicEl.textContent = '¡Es hoy, es hoy!';
+  }
 
   /* ==========================================================
      1. THREE.JS: ENCUADRE ÓPTIMO EN CELULARES Y COMPUTADORAS
@@ -544,8 +801,9 @@
   }
 
   setInterval(() => {
-    if (Math.random() > 0.35) createShootingStar();
-  }, 3000);
+    const prob = isSpecialDay() ? 0.85 : 0.65;
+    if (Math.random() < prob) createShootingStar(isSpecialDay());
+  }, isSpecialDay() ? 1500 : 3000);
 
   /* Frases de la galaxia en ROSA PASTEL SUAVE (Escaladas finas en celular para no amontonarse) */
   function makeSprite(text, k) {
@@ -624,7 +882,11 @@
     // 6. Lirio BICOLOR: Cuerpo Rosa Pastel con bordes y puntas Celeste eléctrico
     { type: 'bicolor', throat: '#a7f3d0', midColor: '#f472b6', tipColor: '#0ea5e9', edgeColor: '#38bdf8', dots: '#0369a1', anther: '#b45309' },
     // 7. Lirio BICOLOR: Acuarela Celeste cristalino y Rosa fucsia suave
-    { type: 'bicolor', throat: '#6ee7b7', midColor: '#7dd3fc', tipColor: '#f43f5e', edgeColor: '#e11d48', dots: '#9f1239', anther: '#d97706' }
+    { type: 'bicolor', throat: '#6ee7b7', midColor: '#7dd3fc', tipColor: '#f43f5e', edgeColor: '#e11d48', dots: '#9f1239', anther: '#d97706' },
+    // 8. Lirio ROSA PASTEL con PUNTAS BLANCAS (variante cálida)
+    { type: 'pink', throat: '#fff1f6', midColor: '#f9a8d4', tipColor: '#ffffff', edgeColor: '#fbcfe8', dots: '#f472b6', anther: '#d97706' },
+    // 9. Lirio ROSA PASTEL con PUNTAS BLANCAS (variante suave)
+    { type: 'pink', throat: '#ffffff', midColor: '#fbcfe8', tipColor: '#ffffff', edgeColor: '#f9a8d4', dots: '#ec4899', anther: '#b45309' }
   ];
 
   function resize() {
@@ -868,13 +1130,32 @@
   }
 
   let lastWhisperIdx = -1;
+  let touchCount1111 = 0;        // contador de toques en sesión (día 11/11)
+  const goldenSparks = [];       // chispas doradas efímeras
+  const goldenWishes = [];       // esferas de deseos enviados
+
   function spawnLily(targetX, targetY) {
     if (lilies.length >= 10) lilies.shift();
     
-    const L = clamp(Math.min(W, H) * 0.08, 38, 64) * (0.9 + Math.random() * 0.2);
+    // En día 11/11: contar toques y preparar lirio especial #11
+    let isEleventhTouch = false;
+    if (isSpecialDay()) {
+      touchCount1111++;
+      if (touchCount1111 === 11) isEleventhTouch = true;
+    }
 
-    // Selección totalmente aleatoria de color entre azul puro, rosa puro y bicolores
-    const randomPal = LILY_PALS[Math.floor(Math.random() * LILY_PALS.length)];
+    const baseL = clamp(Math.min(W, H) * 0.08, 38, 64) * (0.9 + Math.random() * 0.2);
+    const L = isEleventhTouch ? baseL * 2.0 : baseL;
+
+    // Seleccionar paleta: dorada para #11 o minuto 11:11, normal el resto
+    let randomPal;
+    const GOLD_PAL = { type: 'pink', throat: '#fff9e6', midColor: '#fcd34d', tipColor: '#fbbf24', edgeColor: '#f59e0b', dots: '#d97706', anther: '#92400e' };
+
+    if (isEleventhTouch || (isSpecialMinute() && isSpecialDay())) {
+      randomPal = GOLD_PAL;
+    } else {
+      randomPal = LILY_PALS[Math.floor(Math.random() * LILY_PALS.length)];
+    }
 
     lilies.push({
       x: targetX,
@@ -886,21 +1167,40 @@
       pal: randomPal
     });
 
-    // Selección totalmente aleatoria de la frase (evitando repetir dos veces seguidas la misma)
+    // Frase flotante: mensaje especial si es el toque #11
     let rIdx = Math.floor(Math.random() * FLOWER_WHISPERS.length);
     if (rIdx === lastWhisperIdx && FLOWER_WHISPERS.length > 1) {
       rIdx = (rIdx + 1) % FLOWER_WHISPERS.length;
     }
     lastWhisperIdx = rIdx;
 
+    const whisperText = isEleventhTouch
+      ? 'Hiciste florecer 11 lirios ✦ pide un deseo'
+      : FLOWER_WHISPERS[rIdx];
+
     floatingTexts.push({
-      text: FLOWER_WHISPERS[rIdx],
+      text: whisperText,
       x: targetX,
       y: targetY - 20,
       t0: performance.now()
     });
 
-    // En el momento 11:11, cada toque crea una onda expansiva dorada
+    // Chispas doradas en cada toque (solo día 11/11)
+    if (isSpecialDay()) {
+      const sparkCount = isEleventhTouch ? 24 : 8;
+      for (let sp = 0; sp < sparkCount; sp++) {
+        goldenSparks.push({
+          x: targetX + (Math.random() - 0.5) * 40,
+          y: targetY + (Math.random() - 0.5) * 40,
+          vx: (Math.random() - 0.5) * 3,
+          vy: -(1 + Math.random() * 3),
+          size: 2 + Math.random() * (isEleventhTouch ? 5 : 3),
+          life: 1.0
+        });
+      }
+    }
+
+    // Onda dorada durante 11:11
     if (is1111Active) {
       goldenRipples.push({
         x: targetX,
@@ -948,34 +1248,130 @@
 
   /* ==========================================================
      5. DETECCIÓN AUTOMÁTICA DEL MINUTO MÁGICO 11:11 DORADO
+        + MODO REFORZADO CON CUENTA REGRESIVA Y EXPLOSIÓN
      ========================================================== */
   const overlay1111 = $('overlay1111');
+  const countdownEl = $('countdown1111');
+  const flashEl = $('flash1111');
+  const msgEl = $('msg1111');
+  const wishBtnEl = $('wishBtn');
   let is1111Active = false;
+  let countdownRunning = false;
+  let galaxySpeedMult = 1;        // multiplicador de velocidad de rotación
+
+  // Muestra / oculta el botón de deseo según el día
+  function updateWishBtnVisibility() {
+    if (!wishBtnEl) return;
+    if (isSpecialDay() && started) {
+      wishBtnEl.style.display = 'flex';
+      if (isSpecialMinute()) {
+        wishBtnEl.classList.add('gold');
+      } else {
+        wishBtnEl.classList.remove('gold');
+      }
+    } else {
+      wishBtnEl.style.display = 'none';
+    }
+  }
+
+  // Cuenta regresiva de 10 segundos antes del minuto 11:11
+  function startCountdown() {
+    if (countdownRunning) return;
+    countdownRunning = true;
+    let sec = 10;
+    countdownEl.textContent = sec;
+    countdownEl.classList.add('on');
+
+    const cid = setInterval(() => {
+      sec--;
+      if (sec <= 0) {
+        clearInterval(cid);
+        countdownEl.classList.remove('on');
+        countdownRunning = false;
+        trigger1111Explosion();
+        return;
+      }
+      countdownEl.textContent = sec;
+    }, 1000);
+  }
+
+  // Explosión de luz dorada al iniciar el minuto 11:11
+  function trigger1111Explosion() {
+    // Flash visual dorado
+    flashEl.classList.add('on');
+    setTimeout(() => flashEl.classList.remove('on'), 350);
+    setTimeout(() => { flashEl.classList.add('on'); setTimeout(() => flashEl.classList.remove('on'), 200); }, 500);
+
+    // Ráfaga de estrellas fugaces doradas
+    for (let k = 0; k < 12; k++) {
+      setTimeout(() => createShootingStar(true), k * 180);
+    }
+
+    // Arpegio de 8 campanitas
+    for (let k = 0; k < 8; k++) {
+      setTimeout(() => bell(), k * 140);
+    }
+
+    // Vibración si está disponible
+    try { if (navigator.vibrate) navigator.vibrate([200, 100, 200]); } catch (e) {}
+  }
 
   function check1111() {
     const now = new Date();
     const h = now.getHours();
     const m = now.getMinutes();
+    const s = now.getSeconds();
 
-    const activeNow = (h === 11 || h === 23) && (m === 11);
+    const activeNow = isSpecialMinute();
+
+    // Cuenta regresiva en los últimos 10 segundos antes del 11:11
+    if (!is1111Active && !countdownRunning) {
+      const is10Before = ((h === 11 || h === 23) && m === 10 && s >= 50) || forced1111;
+      if (is10Before && !forced1111) startCountdown();
+      if (forced1111 && !is1111Active) trigger1111Explosion();
+    }
 
     if (activeNow || window.__force1111) {
       if (!is1111Active) {
         is1111Active = true;
+        galaxySpeedMult = 3;          // 3× más rápido
         overlay1111.classList.add('active');
+
+        // Mensaje especial
+        if (msgEl) {
+          msgEl.textContent = 'Que este 11:11 te regale todo lo bonito que mereces ✦';
+          msgEl.classList.add('on');
+        }
+
         bell();
         for (let k = 0; k < 8; k++) {
           setTimeout(() => { createShootingStar(true); bell(); }, k * 450);
         }
       }
-      // Actualizar sutilmente la barra de tiempo estelar de 60 segundos
+      // Barra de tiempo
       const sec = window.__force1111 ? (Math.floor(Date.now() / 1000) % 60) : now.getSeconds();
       const bar = $('timelineBar1111');
       if (bar) bar.style.width = ((sec / 60) * 100) + '%';
+
+      // Botón brilla dorado durante 11:11
+      updateWishBtnVisibility();
+
     } else if (!activeNow && !window.__force1111 && is1111Active) {
       is1111Active = false;
+      galaxySpeedMult = 1;
       overlay1111.classList.remove('active');
+
+      // Transición suave al terminar
+      if (msgEl) {
+        msgEl.textContent = 'Tu deseo ya viajó ✦';
+        setTimeout(() => msgEl.classList.remove('on'), 4000);
+      }
+
+      updateWishBtnVisibility();
     }
+
+    // Actualizar visibilidad del botón de deseo
+    updateWishBtnVisibility();
   }
 
   setInterval(check1111, 1000);
@@ -985,13 +1381,159 @@
     window.__force1111 = force;
     is1111Active = force;
     if (force) {
+      galaxySpeedMult = 3;
       overlay1111.classList.add('active');
-      bell();
-      for (let k = 0; k < 8; k++) setTimeout(() => { createShootingStar(true); bell(); }, k * 400);
+      trigger1111Explosion();
     } else {
+      galaxySpeedMult = 1;
       overlay1111.classList.remove('active');
     }
   };
+
+  /* ==========================================================
+     5b. UI DEL DESEO — Botón + Modal + Guardar + Esfera dorada
+     ========================================================== */
+  (function initWishUI() {
+    const overlay = $('wishOverlay');
+    const btn = $('wishBtn');
+    const closeBtn = $('wishClose');
+    const sendBtn = $('wishSend');
+    const input = $('wishInput');
+    if (!overlay || !btn) return;
+
+    // stopPropagation para que no active giro ni lirios
+    [btn, overlay].forEach(el => {
+      ['pointerdown', 'pointerup', 'pointermove'].forEach(evt => {
+        el.addEventListener(evt, e => e.stopPropagation());
+      });
+    });
+
+    btn.addEventListener('pointerup', e => {
+      e.stopPropagation();
+      overlay.classList.add('open');
+      // Ajustar viewport si el teclado tapa el campo
+      try {
+        if (window.visualViewport) {
+          const handler = () => {
+            const vv = window.visualViewport;
+            overlay.style.height = vv.height + 'px';
+            overlay.style.top = vv.offsetTop + 'px';
+          };
+          window.visualViewport.addEventListener('resize', handler);
+          window.visualViewport.addEventListener('scroll', handler);
+          overlay._vvClean = () => {
+            window.visualViewport.removeEventListener('resize', handler);
+            window.visualViewport.removeEventListener('scroll', handler);
+            overlay.style.height = '';
+            overlay.style.top = '';
+          };
+        }
+      } catch (e) {}
+      setTimeout(() => input.focus(), 100);
+    });
+
+    function closeModal() {
+      overlay.classList.remove('open');
+      if (overlay._vvClean) overlay._vvClean();
+    }
+
+    closeBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('pointerup', e => {
+      if (e.target === overlay) closeModal();
+    });
+
+    // Cargar deseos guardados y crear esferas
+    function loadSavedWishes() {
+      try {
+        const arr = JSON.parse(localStorage.getItem('wishes1111') || '[]');
+        arr.forEach(w => {
+          goldenWishes.push({
+            x: Math.random() * W,
+            y: Math.random() * H * 0.5,
+            vx: (Math.random() - 0.5) * 0.15,
+            vy: -(0.05 + Math.random() * 0.1),
+            size: 3 + Math.random() * 2.5,
+            alpha: 0.55 + Math.random() * 0.25,
+            phase: Math.random() * Math.PI * 2,
+            text: w.text,
+            showText: 0, // 0 = no mostrar, >0 = timer
+            settled: true
+          });
+        });
+      } catch (e) {}
+    }
+
+    // Enviar deseo
+    sendBtn.addEventListener('click', () => {
+      const text = input.value.trim();
+      if (!text) return;
+
+      // Guardar en localStorage (máx 11)
+      try {
+        let arr = JSON.parse(localStorage.getItem('wishes1111') || '[]');
+        if (arr.length >= 11) arr.shift();
+        arr.push({ text, ts: Date.now() });
+        localStorage.setItem('wishes1111', JSON.stringify(arr));
+      } catch (e) {}
+
+      // Cerrar modal suave
+      closeModal();
+      input.value = '';
+
+      // Crear esfera dorada que sube volando
+      const startX = W / 2;
+      const startY = H * 0.7;
+      const bigExplosion = isSpecialMinute();
+
+      // Campanitas al enviar
+      for (let k = 0; k < (bigExplosion ? 8 : 4); k++) {
+        setTimeout(() => bell(), k * 120);
+      }
+
+      // Partículas de polvo de estrellas
+      const dustCount = bigExplosion ? 30 : 15;
+      for (let d = 0; d < dustCount; d++) {
+        goldenSparks.push({
+          x: startX + (Math.random() - 0.5) * 20,
+          y: startY + (Math.random() - 0.5) * 20,
+          vx: (Math.random() - 0.5) * 4,
+          vy: -(2 + Math.random() * 4),
+          size: 1.5 + Math.random() * (bigExplosion ? 4 : 2.5),
+          life: 1.0
+        });
+      }
+
+      // La esfera que sube y se queda como estrella
+      goldenWishes.push({
+        x: startX,
+        y: startY,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: -(1.5 + Math.random()),
+        size: bigExplosion ? 6 : 4,
+        alpha: 1.0,
+        phase: Math.random() * Math.PI * 2,
+        text: text,
+        showText: 0,
+        settled: false,
+        targetY: 40 + Math.random() * (H * 0.25)
+      });
+    });
+
+    // Detectar click sobre esferas de deseos para revelar texto
+    lc.addEventListener('pointerup', e => {
+      if (!started) return;
+      for (const w of goldenWishes) {
+        if (!w.settled) continue;
+        const dx = e.clientX - w.x, dy = e.clientY - w.y;
+        if (Math.sqrt(dx * dx + dy * dy) < 28) {
+          w.showText = performance.now();
+          break;
+        }
+      }
+    });
+
+    loadSavedWishes();
+  })();
 
   /* ==========================================================
      6. INTERACCIÓN SLOW-MOTION CON EL RATÓN (CERO ENGANCHE)
@@ -1156,9 +1698,9 @@
 
     if (started && enter < 1) enter = Math.min(1, enter + dt / 3.4);
 
-    // Giro autónomo constante muy lento
+    // Giro autónomo constante — 3× más rápido durante 11:11
     if (!isPointerDown) {
-      targetRotY += 0.00075;
+      targetRotY += 0.00075 * galaxySpeedMult;
     }
 
     // Interpolación slow-motion ultrasuave y protegida contra NaN
@@ -1228,8 +1770,8 @@
     camera.lookAt(0, 0, 0);
     renderer.render(scene, camera);
 
-    // Render de lirios, frases flotantes, wish orbs y golden ripples
-    const hasContent = lilies.length || floatingTexts.length || wishOrbs.length || goldenRipples.length;
+    // Render de lirios, frases flotantes, wish orbs, golden ripples, sparks y deseos
+    const hasContent = lilies.length || floatingTexts.length || wishOrbs.length || goldenRipples.length || goldenSparks.length || goldenWishes.length;
     if (hasContent) {
       lx.clearRect(0, 0, W, H);
       
@@ -1272,17 +1814,116 @@
         lx.restore();
       }
 
+      // ★ Chispas doradas (goldenSparks) — día 11/11
+      for (let s = goldenSparks.length - 1; s >= 0; s--) {
+        const sp = goldenSparks[s];
+        sp.x += sp.vx;
+        sp.y += sp.vy;
+        sp.vy += 0.04;           // gravedad suave
+        sp.life -= 0.025;
+
+        if (sp.life <= 0) {
+          goldenSparks.splice(s, 1);
+          continue;
+        }
+
+        lx.save();
+        lx.globalAlpha = sp.life;
+        lx.shadowColor = '#fbbf24';
+        lx.shadowBlur = 10;
+        lx.fillStyle = sp.life > 0.5 ? '#fff9db' : '#fcd34d';
+        lx.beginPath();
+        lx.arc(sp.x, sp.y, sp.size * sp.life, 0, Math.PI * 2);
+        lx.fill();
+        lx.restore();
+      }
+
+      // ★ Esferas de deseos dorados (goldenWishes)
+      for (let gw = goldenWishes.length - 1; gw >= 0; gw--) {
+        const w = goldenWishes[gw];
+
+        // Si no se ha asentado: sube hasta su targetY
+        if (!w.settled) {
+          w.phase += 0.04;
+          w.x += w.vx + Math.sin(w.phase) * 0.6;
+          w.y += w.vy;
+          // Estela de polvo de estrellas mientras sube
+          if (Math.random() < 0.4) {
+            goldenSparks.push({
+              x: w.x + (Math.random() - 0.5) * 6,
+              y: w.y + 4,
+              vx: (Math.random() - 0.5) * 1.2,
+              vy: 0.3 + Math.random() * 0.5,
+              size: 1 + Math.random() * 1.5,
+              life: 0.6
+            });
+          }
+          if (w.y <= w.targetY) {
+            w.settled = true;
+            w.vy = 0;
+            w.alpha = 0.7 + Math.random() * 0.2;
+          }
+        } else {
+          // Titileo sutil como estrella
+          w.phase += 0.02;
+          w.x += Math.sin(w.phase) * 0.12;
+          w.y += Math.cos(w.phase * 0.7) * 0.06;
+        }
+
+        // Dibujar la esfera dorada
+        lx.save();
+        const twinkle = 0.75 + Math.sin(now / 300 + w.phase) * 0.25;
+        lx.globalAlpha = w.alpha * twinkle;
+        lx.shadowColor = '#fbbf24';
+        lx.shadowBlur = 20;
+
+        const wGrad = lx.createRadialGradient(w.x, w.y, 0, w.x, w.y, w.size * 3);
+        wGrad.addColorStop(0, 'rgba(255,255,255,0.95)');
+        wGrad.addColorStop(0.25, 'rgba(253,224,71,0.85)');
+        wGrad.addColorStop(0.6, 'rgba(251,191,36,0.4)');
+        wGrad.addColorStop(1, 'rgba(245,158,11,0)');
+        lx.fillStyle = wGrad;
+        lx.beginPath();
+        lx.arc(w.x, w.y, w.size * 3, 0, Math.PI * 2);
+        lx.fill();
+
+        // Centro blanco brillante
+        lx.fillStyle = '#fffef5';
+        lx.beginPath();
+        lx.arc(w.x, w.y, w.size * 0.6, 0, Math.PI * 2);
+        lx.fill();
+
+        // Mostrar texto del deseo si fue tocada
+        if (w.showText > 0) {
+          const stAge = (now - w.showText) / 1000;
+          if (stAge < 3.5) {
+            let tAlpha = 1;
+            if (stAge < 0.4) tAlpha = stAge / 0.4;
+            else if (stAge > 2.5) tAlpha = 1 - (stAge - 2.5) / 1.0;
+            lx.globalAlpha = tAlpha;
+            lx.font = "italic 500 16px 'Cormorant Garamond',Georgia,serif";
+            lx.textAlign = 'center';
+            lx.textBaseline = 'bottom';
+            lx.shadowColor = 'rgba(251,191,36,0.9)';
+            lx.shadowBlur = 12;
+            lx.fillStyle = '#fef3c7';
+            lx.fillText(w.text, w.x, w.y - w.size * 3.5);
+          } else {
+            w.showText = 0;
+          }
+        }
+        lx.restore();
+      }
+
       // Wish orbs (luciérnagas doradas flotantes durante 11:11)
       for (let w = wishOrbs.length - 1; w >= 0; w--) {
         const orb = wishOrbs[w];
         
-        // Movimiento flotante con ondulación suave
         orb.phase += 0.025;
         orb.x += orb.vx + Math.sin(orb.phase) * 0.4;
         orb.y += orb.vy;
         orb.alpha -= 0.002;
         
-        // Guardar trail (estela)
         orb.trail.push({ x: orb.x, y: orb.y });
         if (orb.trail.length > 12) orb.trail.shift();
         
@@ -1293,7 +1934,6 @@
         
         lx.save();
         
-        // Dibujar estela
         for (let ti = 0; ti < orb.trail.length; ti++) {
           const tp = orb.trail[ti];
           const trailAlpha = (ti / orb.trail.length) * orb.alpha * 0.35;
@@ -1306,7 +1946,6 @@
           lx.fill();
         }
         
-        // Orbe principal con glow dorado
         lx.globalAlpha = orb.alpha;
         lx.shadowColor = '#f59e0b';
         lx.shadowBlur = 18;
@@ -1322,7 +1961,6 @@
         lx.arc(orb.x, orb.y, orb.size * 2.5, 0, Math.PI * 2);
         lx.fill();
         
-        // Centro brillante
         lx.fillStyle = '#ffffff';
         lx.beginPath();
         lx.arc(orb.x, orb.y, orb.size * 0.5, 0, Math.PI * 2);
@@ -1331,7 +1969,7 @@
         lx.restore();
       }
 
-      if (!lilies.length && !floatingTexts.length && !wishOrbs.length && !goldenRipples.length) lx.clearRect(0, 0, W, H);
+      if (!lilies.length && !floatingTexts.length && !wishOrbs.length && !goldenRipples.length && !goldenSparks.length && !goldenWishes.length) lx.clearRect(0, 0, W, H);
     }
   }
 
