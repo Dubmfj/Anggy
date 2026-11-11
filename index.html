@@ -97,7 +97,7 @@
     position: fixed;
     left: 0;
     right: 0;
-    bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(68px + env(safe-area-inset-bottom, 0px));
     z-index: 3;
     text-align: center;
     font-family: 'Cormorant Garamond', Georgia, serif;
@@ -241,51 +241,69 @@
     to { transform: scale(1.03); filter: drop-shadow(0 0 60px rgba(251, 191, 36, 0.9)); }
   }
 
-  /* ========== BOTÓN "PIDE UN DESEO" ========== */
-  #wishBtn {
+  /* ========== BOTONES INFERIORES: DESEO & MIS DESEOS ========== */
+  #wishBtnGroup {
     position: fixed;
-    bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(18px + env(safe-area-inset-bottom, 0px));
     left: 50%;
     transform: translateX(-50%);
     z-index: 9;
-    display: none;                      /* oculto por defecto */
+    display: none;                      /* oculto hasta started === true */
+    align-items: center;
+    gap: 8px;
+    pointer-events: auto;
+  }
+  .wish-pill {
+    display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 10px 22px;
-    border: 1px solid rgba(251,191,36,0.45);
-    border-radius: 28px;
-    background: rgba(10,5,18,0.65);
+    padding: 8px 16px;
+    border: 1px solid rgba(251,191,36,0.35);
+    border-radius: 24px;
+    background: rgba(14,8,22,0.72);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     cursor: pointer;
     font-family: 'Cormorant Garamond', Georgia, serif;
     font-style: italic;
-    font-size: clamp(15px, 3.8vw, 18px);
+    font-size: clamp(13.5px, 3.4vw, 16px);
     color: #fef3c7;
-    text-shadow: 0 0 12px rgba(251,191,36,0.7);
-    box-shadow: 0 0 18px rgba(251,191,36,0.25), inset 0 0 12px rgba(244,114,182,0.12);
-    animation: wishBeat 2.4s ease-in-out infinite;
-    transition: box-shadow .4s, border-color .4s;
+    text-shadow: 0 0 10px rgba(251,191,36,0.5);
+    box-shadow: 0 0 14px rgba(251,191,36,0.18), inset 0 0 10px rgba(244,114,182,0.08);
+    transition: all .3s ease;
+    white-space: nowrap;
+    user-select: none;
+    -webkit-user-select: none;
   }
-  #wishBtn .star-icon {
+  .wish-pill:active {
+    transform: scale(0.96);
+  }
+  .wish-pill .star-icon {
     display: inline-block;
-    animation: starPulse 1.6s ease-in-out infinite;
+    animation: starPulse 1.8s ease-in-out infinite;
   }
-  #wishBtn.gold {
-    border-color: #fbbf24;
-    box-shadow: 0 0 30px rgba(251,191,36,0.6), 0 0 60px rgba(245,158,11,0.3), inset 0 0 15px rgba(251,191,36,0.2);
-    color: #fff;
+  #wishBtn.dia1111 {
+    font-size: clamp(15px, 3.8vw, 18px);
+    padding: 9px 20px;
+    border-color: rgba(251,191,36,0.7);
+    box-shadow: 0 0 22px rgba(251,191,36,0.4), inset 0 0 14px rgba(244,114,182,0.2);
+    animation: wishBeat 2.2s ease-in-out infinite;
+  }
+  .wish-pill.gold {
+    border-color: #fbbf24 !important;
+    box-shadow: 0 0 25px rgba(251,191,36,0.65), 0 0 45px rgba(245,158,11,0.35), inset 0 0 12px rgba(251,191,36,0.25) !important;
+    color: #ffffff !important;
   }
   @keyframes wishBeat {
-    0%, 100% { transform: translateX(-50%) scale(1); }
-    50%      { transform: translateX(-50%) scale(1.06); }
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.06); }
   }
   @keyframes starPulse {
     0%, 100% { opacity: .7; transform: scale(1); }
     50%      { opacity: 1;  transform: scale(1.25); }
   }
 
-  /* ========== MODAL GLASSMORPHISM DEL DESEO ========== */
+  /* ========== MODAL GLASSMORPHISM: ESCRIBE TU DESEO ========== */
   #wishOverlay {
     position: fixed;
     inset: 0;
@@ -293,7 +311,7 @@
     display: none;
     align-items: center;
     justify-content: center;
-    background: rgba(0,0,0,0.45);
+    background: rgba(0,0,0,0.5);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     transition: opacity .45s ease;
@@ -311,7 +329,7 @@
     width: min(340px, 88vw);
     padding: 28px 24px 22px;
     border-radius: 22px;
-    background: rgba(16,10,28,0.82);
+    background: rgba(16,10,28,0.85);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
     border: 1px solid rgba(244,114,182,0.35);
@@ -331,11 +349,12 @@
     font-family: 'Cormorant Garamond', Georgia, serif;
     font-style: italic;
     font-weight: 500;
-    font-size: clamp(20px, 5vw, 26px);
+    font-size: clamp(19px, 4.8vw, 24px);
     background: linear-gradient(135deg, #fff 20%, #ffd4e8 50%, #fef3c7 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+    line-height: 1.25;
   }
   .wish-card input {
     display: block;
@@ -359,7 +378,7 @@
     color: rgba(255,255,255,0.35);
     font-style: italic;
   }
-  .wish-card button {
+  .wish-card button.send-btn {
     width: 100%;
     padding: 12px;
     border: none;
@@ -374,7 +393,7 @@
     box-shadow: 0 4px 18px rgba(244,114,182,0.3);
     transition: transform .2s, box-shadow .2s;
   }
-  .wish-card button:active {
+  .wish-card button.send-btn:active {
     transform: scale(.97);
   }
   .wish-card .wish-close {
@@ -391,10 +410,175 @@
     box-shadow: none;
   }
 
+  /* ========== MODAL GLASSMORPHISM: MIS DESEOS ========== */
+  #wishesListOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 12;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: opacity .45s ease;
+  }
+  #wishesListOverlay.open {
+    display: flex;
+    animation: fadeInModal .45s ease;
+  }
+  .wishes-list-card {
+    position: relative;
+    width: min(390px, 92vw);
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 20px 18px;
+    border-radius: 22px;
+    background: rgba(16,10,28,0.88);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(244,114,182,0.35);
+    box-shadow:
+      0 0 28px rgba(244,114,182,0.18),
+      0 0 48px rgba(251,191,36,0.12),
+      inset 0 0 20px rgba(186,230,253,0.06);
+    text-align: center;
+    animation: cardIn .5s cubic-bezier(.16,1,.3,1);
+    box-sizing: border-box;
+  }
+  .wishes-subtitle {
+    margin: -10px 0 14px;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-size: 14.5px;
+    color: rgba(254,243,199,0.7);
+  }
+  .wishes-scroll {
+    overflow-y: auto;
+    max-height: 52vh;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+    padding: 4px 6px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: left;
+  }
+  .wishes-scroll::-webkit-scrollbar {
+    width: 4px;
+  }
+  .wishes-scroll::-webkit-scrollbar-thumb {
+    background: rgba(251,191,36,0.35);
+    border-radius: 4px;
+  }
+  .wish-item {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(244,114,182,0.22);
+    border-radius: 14px;
+    padding: 12px 14px;
+    position: relative;
+    transition: all .3s ease;
+  }
+  .wish-item.done {
+    border-color: rgba(186,230,253,0.3);
+    background: rgba(255,255,255,0.025);
+  }
+  .wish-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .wish-date {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.5px;
+  }
+  .wish-special-tag {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-size: 12px;
+    color: #fcd34d;
+    background: rgba(251,191,36,0.18);
+    border: 1px solid rgba(251,191,36,0.4);
+    border-radius: 10px;
+    padding: 2px 7px;
+  }
+  .wish-text {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 16px;
+    line-height: 1.35;
+    color: #fff;
+    word-break: break-word;
+    margin-bottom: 10px;
+  }
+  .wish-item.done .wish-text {
+    text-decoration: line-through rgba(244,114,182,0.55);
+    color: rgba(245,215,235,0.7);
+  }
+  .wish-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .wish-btn-done {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 12px;
+    border: 1px solid rgba(186,230,253,0.35);
+    border-radius: 12px;
+    background: rgba(56,189,248,0.12);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-size: 13.5px;
+    color: #bae6fd;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .wish-item.done .wish-btn-done {
+    background: rgba(244,114,182,0.22);
+    border-color: rgba(244,114,182,0.5);
+    color: #fbcfe8;
+  }
+  .wish-btn-del {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.35);
+    font-size: 14px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 8px;
+    transition: color .2s;
+  }
+  .wish-btn-del:hover {
+    color: #fda4af;
+  }
+  .wishes-empty {
+    padding: 30px 10px;
+    text-align: center;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-size: 17px;
+    color: rgba(254,243,199,0.7);
+  }
+  .wishes-note {
+    margin: 12px 0 0;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-size: 12px;
+    color: rgba(255,255,255,0.38);
+    text-align: center;
+  }
+
   /* ========== MENSAJE 11:11 REFORZADO ========== */
   #msg1111 {
     position: fixed;
-    bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
     left: 0; right: 0;
     z-index: 8;
     text-align: center;
@@ -466,16 +650,30 @@
   <div class="timeline-1111"><div class="timeline-bar-1111" id="timelineBar1111"></div></div>
 </div>
 
-<!-- Botón "pide un deseo" (solo día 11/11) -->
-<div id="wishBtn"><span class="star-icon">✦</span> pide un deseo</div>
+<!-- Botones inferiores en fila -->
+<div id="wishBtnGroup">
+  <button id="wishBtn" class="wish-pill"><span class="star-icon">✦</span> <span id="wishBtnText">pide un deseo</span></button>
+  <button id="wishesListBtn" class="wish-pill"><span class="star-icon">✧</span> <span id="wishesListBtnText">mis deseos</span></button>
+</div>
 
-<!-- Modal glassmorphism del deseo -->
+<!-- Modal glassmorphism: Escribe tu deseo -->
 <div id="wishOverlay">
   <div class="wish-card">
     <button class="wish-close" id="wishClose">✕</button>
-    <h2>Escribe tu deseo ✦</h2>
-    <input id="wishInput" type="text" placeholder="Lo que quieras pedir…" maxlength="200" autocomplete="off" />
-    <button id="wishSend">Enviar a las estrellas ✦</button>
+    <h2 id="wishModalTitle">Escribe tu deseo ✦</h2>
+    <input id="wishInput" type="text" placeholder="Lo que quieras pedir…" maxlength="300" autocomplete="off" />
+    <button id="wishSend" class="send-btn">Enviar a las estrellas ✦</button>
+  </div>
+</div>
+
+<!-- Modal glassmorphism: Mis Deseos -->
+<div id="wishesListOverlay">
+  <div class="wishes-list-card">
+    <button class="wish-close" id="wishesListClose">✕</button>
+    <h2>Mis deseos ✦</h2>
+    <p class="wishes-subtitle" id="wishesSubtitle">0 deseos en las estrellas</p>
+    <div class="wishes-scroll" id="wishesScroll"></div>
+    <p class="wishes-note">Tus deseos se guardan solo en este dispositivo ✦</p>
   </div>
 </div>
 
@@ -1256,23 +1454,54 @@
   const countdownEl = $('countdown1111');
   const flashEl = $('flash1111');
   const msgEl = $('msg1111');
+  const wishBtnGroupEl = $('wishBtnGroup');
   const wishBtnEl = $('wishBtn');
+  const wishBtnTextEl = $('wishBtnText');
+  const wishesListBtnEl = $('wishesListBtn');
+  const wishesListBtnTextEl = $('wishesListBtnText');
   let is1111Active = false;
   let countdownRunning = false;
   let galaxySpeedMult = 1;        // multiplicador de velocidad de rotación
 
-  // Muestra / oculta el botón de deseo según el día
+  // Muestra / oculta el grupo de botones de deseo y ajusta su estilo
   function updateWishBtnVisibility() {
-    if (!wishBtnEl) return;
-    if (isSpecialDay() && started) {
-      wishBtnEl.style.display = 'flex';
-      if (isSpecialMinute()) {
-        wishBtnEl.classList.add('gold');
-      } else {
-        wishBtnEl.classList.remove('gold');
+    if (!wishBtnGroupEl) return;
+    if (started) {
+      wishBtnGroupEl.style.display = 'inline-flex';
+      const spDay = isSpecialDay();
+      const spMin = isSpecialMinute();
+
+      // Botón "pide un deseo"
+      if (wishBtnEl) {
+        if (spDay) {
+          wishBtnEl.classList.add('dia1111');
+          if (wishBtnTextEl) wishBtnTextEl.textContent = 'pide un deseo';
+        } else {
+          wishBtnEl.classList.remove('dia1111');
+          if (wishBtnTextEl) wishBtnTextEl.textContent = 'pedir un deseo';
+        }
+
+        if (spMin) {
+          wishBtnEl.classList.add('gold');
+        } else {
+          wishBtnEl.classList.remove('gold');
+        }
+      }
+
+      // Botón "mis deseos"
+      if (wishesListBtnEl) {
+        if (spMin) {
+          wishesListBtnEl.classList.add('gold');
+        } else {
+          wishesListBtnEl.classList.remove('gold');
+        }
+      }
+
+      if (typeof updateWishCountUI === 'function') {
+        updateWishCountUI();
       }
     } else {
-      wishBtnEl.style.display = 'none';
+      wishBtnGroupEl.style.display = 'none';
     }
   }
 
@@ -1405,135 +1634,401 @@
   };
 
   /* ==========================================================
-     5b. UI DEL DESEO — Botón + Modal + Guardar + Esfera dorada
+     5b. UI DEL DESEO Y MIS DESEOS — Botones + Modales + Storage + Esferas
      ========================================================== */
   (function initWishUI() {
-    const overlay = $('wishOverlay');
-    const btn = $('wishBtn');
-    const closeBtn = $('wishClose');
+    const wishOverlay = $('wishOverlay');
+    const wishesListOverlay = $('wishesListOverlay');
+    const wishBtn = $('wishBtn');
+    const wishesListBtn = $('wishesListBtn');
+    const wishCloseBtn = $('wishClose');
+    const wishesListCloseBtn = $('wishesListClose');
     const sendBtn = $('wishSend');
     const input = $('wishInput');
-    if (!overlay || !btn) return;
+    const wishModalTitle = $('wishModalTitle');
+    const wishesScroll = $('wishesScroll');
+    const wishesSubtitle = $('wishesSubtitle');
+    const wishesListBtnText = $('wishesListBtnText');
 
-    // stopPropagation para que no active giro ni lirios
-    [btn, overlay].forEach(el => {
+    // Funciones para localStorage de deseos (clave 'wishes1111')
+    function getStoredWishes() {
+      try {
+        const raw = localStorage.getItem('wishes1111');
+        if (!raw) return [];
+        const list = JSON.parse(raw);
+        if (!Array.isArray(list)) return [];
+        let migrated = false;
+        const clean = list.map((w, idx) => {
+          if (typeof w !== 'object' || w === null) {
+            w = { text: String(w) };
+            migrated = true;
+          }
+          const item = {
+            id: w.id || ('w_' + (w.ts || Date.now()) + '_' + idx + '_' + Math.random().toString(36).slice(2, 6)),
+            text: String(w.text || '').slice(0, 300),
+            ts: typeof w.ts === 'number' ? w.ts : Date.now(),
+            special: !!w.special,
+            done: !!w.done
+          };
+          if (!w.id || typeof w.special === 'undefined' || typeof w.done === 'undefined') {
+            migrated = true;
+          }
+          return item;
+        });
+        if (migrated) {
+          try { localStorage.setItem('wishes1111', JSON.stringify(clean)); } catch (e) {}
+        }
+        return clean;
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveStoredWishes(arr) {
+      try {
+        localStorage.setItem('wishes1111', JSON.stringify(arr));
+      } catch (e) {}
+      updateWishCountUI();
+    }
+
+    window.updateWishCountUI = function() {
+      const list = getStoredWishes();
+      const count = list.length;
+      if (wishesListBtnText) {
+        wishesListBtnText.textContent = count > 0 ? `mis deseos · ${count}` : 'mis deseos';
+      }
+      if (wishesSubtitle) {
+        wishesSubtitle.textContent = count === 1 ? '1 deseo en las estrellas' : `${count} deseos en las estrellas`;
+      }
+    };
+
+    // stopPropagation en botones y ventanas para no mover galaxia ni crear lirios
+    const stopElements = [
+      $('wishBtnGroup'),
+      wishBtn,
+      wishesListBtn,
+      wishOverlay,
+      wishesListOverlay
+    ].filter(Boolean);
+
+    stopElements.forEach(el => {
       ['pointerdown', 'pointerup', 'pointermove'].forEach(evt => {
         el.addEventListener(evt, e => e.stopPropagation());
       });
     });
 
-    btn.addEventListener('pointerup', e => {
-      e.stopPropagation();
-      overlay.classList.add('open');
-      // Ajustar viewport si el teclado tapa el campo
+    // --- Modal: Escribe tu deseo ---
+    function openWishModal() {
+      if (!wishOverlay) return;
+      if (wishModalTitle) {
+        wishModalTitle.textContent = isSpecialDay()
+          ? 'Hoy es 11/11 ✦ pide con todo el corazón'
+          : 'Escribe tu deseo ✦';
+      }
+      wishOverlay.classList.add('open');
       try {
         if (window.visualViewport) {
           const handler = () => {
             const vv = window.visualViewport;
-            overlay.style.height = vv.height + 'px';
-            overlay.style.top = vv.offsetTop + 'px';
+            wishOverlay.style.height = vv.height + 'px';
+            wishOverlay.style.top = vv.offsetTop + 'px';
           };
           window.visualViewport.addEventListener('resize', handler);
           window.visualViewport.addEventListener('scroll', handler);
-          overlay._vvClean = () => {
+          wishOverlay._vvClean = () => {
             window.visualViewport.removeEventListener('resize', handler);
             window.visualViewport.removeEventListener('scroll', handler);
-            overlay.style.height = '';
-            overlay.style.top = '';
+            wishOverlay.style.height = '';
+            wishOverlay.style.top = '';
           };
         }
       } catch (e) {}
-      setTimeout(() => input.focus(), 100);
-    });
-
-    function closeModal() {
-      overlay.classList.remove('open');
-      if (overlay._vvClean) overlay._vvClean();
+      setTimeout(() => { if (input) input.focus(); }, 120);
     }
 
-    closeBtn.addEventListener('click', closeModal);
-    overlay.addEventListener('pointerup', e => {
-      if (e.target === overlay) closeModal();
-    });
+    function closeWishModal() {
+      if (!wishOverlay) return;
+      wishOverlay.classList.remove('open');
+      if (wishOverlay._vvClean) wishOverlay._vvClean();
+    }
 
-    // Cargar deseos guardados y crear esferas
-    function loadSavedWishes() {
-      try {
-        const arr = JSON.parse(localStorage.getItem('wishes1111') || '[]');
-        arr.forEach(w => {
-          goldenWishes.push({
-            x: Math.random() * W,
-            y: Math.random() * H * 0.5,
-            vx: (Math.random() - 0.5) * 0.15,
-            vy: -(0.05 + Math.random() * 0.1),
-            size: 3 + Math.random() * 2.5,
-            alpha: 0.55 + Math.random() * 0.25,
-            phase: Math.random() * Math.PI * 2,
-            text: w.text,
-            showText: 0, // 0 = no mostrar, >0 = timer
-            settled: true
+    if (wishBtn) {
+      wishBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        openWishModal();
+      });
+    }
+
+    if (wishCloseBtn) {
+      wishCloseBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        closeWishModal();
+      });
+    }
+
+    if (wishOverlay) {
+      wishOverlay.addEventListener('click', e => {
+        if (e.target === wishOverlay) closeWishModal();
+      });
+    }
+
+    // --- Modal: Mis Deseos ---
+    function openWishesListModal() {
+      if (!wishesListOverlay) return;
+      renderWishesList();
+      wishesListOverlay.classList.add('open');
+    }
+
+    function closeWishesListModal() {
+      if (!wishesListOverlay) return;
+      wishesListOverlay.classList.remove('open');
+    }
+
+    if (wishesListBtn) {
+      wishesListBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        openWishesListModal();
+      });
+    }
+
+    if (wishesListCloseBtn) {
+      wishesListCloseBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        closeWishesListModal();
+      });
+    }
+
+    if (wishesListOverlay) {
+      wishesListOverlay.addEventListener('click', e => {
+        if (e.target === wishesListOverlay) closeWishesListModal();
+      });
+    }
+
+    function renderWishesList() {
+      if (!wishesScroll) return;
+      const list = getStoredWishes();
+      updateWishCountUI();
+      if (list.length === 0) {
+        wishesScroll.innerHTML = '<div class="wishes-empty">Aún no hay deseos. Pide el primero ✦</div>';
+        return;
+      }
+
+      // Ordenar del más nuevo al más antiguo
+      const sorted = [...list].sort((a, b) => b.ts - a.ts);
+      wishesScroll.innerHTML = '';
+
+      sorted.forEach(w => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'wish-item' + (w.done ? ' done' : '');
+
+        let dateStr = '';
+        try {
+          const d = new Date(w.ts);
+          dateStr = d.toLocaleString('es-PE', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
           });
+        } catch (e) {
+          dateStr = '';
+        }
+
+        const specialBadge = w.special ? '<span class="wish-special-tag">11/11 ✦</span>' : '';
+
+        const safeDiv = document.createElement('div');
+        safeDiv.textContent = w.text;
+        const textHtml = safeDiv.innerHTML;
+
+        itemEl.innerHTML = `
+          <div class="wish-item-header">
+            <span class="wish-date">${dateStr}</span>
+            ${specialBadge}
+          </div>
+          <div class="wish-text">${textHtml}</div>
+          <div class="wish-actions">
+            <button class="wish-btn-done" type="button">${w.done ? '✓ Cumplido' : '✓ Se cumplió'}</button>
+            <button class="wish-btn-del" type="button" title="Borrar deseo">🗑</button>
+          </div>
+        `;
+
+        const doneBtn = itemEl.querySelector('.wish-btn-done');
+        doneBtn.addEventListener('click', ev => {
+          ev.stopPropagation();
+          toggleWishDone(w.id);
         });
-      } catch (e) {}
+
+        const delBtn = itemEl.querySelector('.wish-btn-del');
+        delBtn.addEventListener('click', ev => {
+          ev.stopPropagation();
+          deleteWish(w.id);
+        });
+
+        wishesScroll.appendChild(itemEl);
+      });
     }
 
-    // Enviar deseo
-    sendBtn.addEventListener('click', () => {
-      const text = input.value.trim();
+    function toggleWishDone(id) {
+      let list = getStoredWishes();
+      let justDone = false;
+      list = list.map(item => {
+        if (item.id === id) {
+          const next = !item.done;
+          if (next) justDone = true;
+          return { ...item, done: next };
+        }
+        return item;
+      });
+      saveStoredWishes(list);
+
+      // Sincronizar en las estrellas del cielo
+      for (const gw of goldenWishes) {
+        if (gw.id === id) {
+          gw.done = !gw.done;
+        }
+      }
+
+      // Celebración si se cumplió
+      if (justDone) {
+        try { bell(); } catch (e) {}
+        const cx = W / 2, cy = H / 2;
+        for (let i = 0; i < 22; i++) {
+          goldenSparks.push({
+            x: cx + (Math.random() - 0.5) * 100,
+            y: cy + (Math.random() - 0.5) * 100,
+            vx: (Math.random() - 0.5) * 4.5,
+            vy: (Math.random() - 0.5) * 4.5 - 1.5,
+            size: 2 + Math.random() * 3.5,
+            life: 1.0
+          });
+        }
+      }
+
+      renderWishesList();
+    }
+
+    function deleteWish(id) {
+      if (!confirm('¿Borrar este deseo?')) return;
+      let list = getStoredWishes();
+      list = list.filter(item => item.id !== id);
+      saveStoredWishes(list);
+
+      const idx = goldenWishes.findIndex(gw => gw.id === id);
+      if (idx !== -1) goldenWishes.splice(idx, 1);
+
+      renderWishesList();
+    }
+
+    // --- Enviar deseo ---
+    function sendWish() {
+      if (!input) return;
+      const text = input.value.trim().slice(0, 300);
       if (!text) return;
 
-      // Guardar en localStorage (máx 11)
-      try {
-        let arr = JSON.parse(localStorage.getItem('wishes1111') || '[]');
-        if (arr.length >= 11) arr.shift();
-        arr.push({ text, ts: Date.now() });
-        localStorage.setItem('wishes1111', JSON.stringify(arr));
-      } catch (e) {}
+      // Fecha real para 'special' (11 de noviembre real)
+      const realNow = new Date();
+      const isReal1111 = (realNow.getMonth() === 10 && realNow.getDate() === 11);
 
-      // Cerrar modal suave
-      closeModal();
+      const newWish = {
+        id: 'w_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+        text: text,
+        ts: Date.now(),
+        special: isReal1111,
+        done: false
+      };
+
+      // Guardar sin límite
+      const list = getStoredWishes();
+      list.push(newWish);
+      saveStoredWishes(list);
+
+      closeWishModal();
       input.value = '';
 
-      // Crear esfera dorada que sube volando
+      // Crear esfera dorada que sube volando a la galaxia
       const startX = W / 2;
-      const startY = H * 0.7;
-      const bigExplosion = isSpecialMinute();
+      const startY = H * 0.72;
+      const isBig = isSpecialDay() || isSpecialMinute();
 
       // Campanitas al enviar
-      for (let k = 0; k < (bigExplosion ? 8 : 4); k++) {
+      for (let k = 0; k < (isBig ? 8 : 4); k++) {
         setTimeout(() => bell(), k * 120);
       }
 
-      // Partículas de polvo de estrellas
-      const dustCount = bigExplosion ? 30 : 15;
+      // Polvo de estrellas
+      const dustCount = isBig ? 32 : 16;
       for (let d = 0; d < dustCount; d++) {
         goldenSparks.push({
-          x: startX + (Math.random() - 0.5) * 20,
-          y: startY + (Math.random() - 0.5) * 20,
+          x: startX + (Math.random() - 0.5) * 24,
+          y: startY + (Math.random() - 0.5) * 24,
           vx: (Math.random() - 0.5) * 4,
           vy: -(2 + Math.random() * 4),
-          size: 1.5 + Math.random() * (bigExplosion ? 4 : 2.5),
+          size: 1.5 + Math.random() * (isBig ? 4 : 2.5),
           life: 1.0
         });
       }
 
       // La esfera que sube y se queda como estrella
       goldenWishes.push({
+        id: newWish.id,
         x: startX,
         y: startY,
         vx: (Math.random() - 0.5) * 0.3,
         vy: -(1.5 + Math.random()),
-        size: bigExplosion ? 6 : 4,
+        size: isBig ? 6 : 4,
         alpha: 1.0,
         phase: Math.random() * Math.PI * 2,
         text: text,
+        done: false,
         showText: 0,
         settled: false,
-        targetY: 40 + Math.random() * (H * 0.25)
+        targetY: 40 + Math.random() * (H * 0.28)
       });
-    });
+    }
 
-    // Detectar click sobre esferas de deseos para revelar texto
+    if (sendBtn) {
+      sendBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        sendWish();
+      });
+    }
+
+    if (input) {
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          sendWish();
+        }
+      });
+    }
+
+    // Cargar deseos guardados como estrellas titilando en el cielo
+    function loadSavedWishes() {
+      try {
+        const arr = getStoredWishes();
+        // Limitar a los últimos 120 para mantener fluidez a 60 FPS
+        const toRender = arr.slice(-120);
+        toRender.forEach(w => {
+          goldenWishes.push({
+            id: w.id,
+            x: 35 + Math.random() * Math.max(10, W - 70),
+            y: 35 + Math.random() * Math.max(10, H * 0.48),
+            vx: (Math.random() - 0.5) * 0.12,
+            vy: -(0.03 + Math.random() * 0.08),
+            size: 2.8 + Math.random() * 2.4,
+            alpha: 0.65 + Math.random() * 0.25,
+            phase: Math.random() * Math.PI * 2,
+            text: w.text,
+            done: !!w.done,
+            showText: 0,
+            settled: true
+          });
+        });
+      } catch (e) {}
+    }
+
+    // Detectar toque sobre estrellas de deseos para revelar texto
     lc.addEventListener('pointerup', e => {
       if (!started) return;
       for (const w of goldenWishes) {
@@ -1547,6 +2042,7 @@
     });
 
     loadSavedWishes();
+    updateWishCountUI();
   })();
 
   /* ==========================================================
@@ -1927,44 +2423,75 @@
           w.y += Math.cos(w.phase * 0.7) * 0.06;
         }
 
-        // Dibujar la esfera dorada
+        // Dibujar la estrella (dorada o rosa/blanco si cumplido)
         lx.save();
         const twinkle = 0.75 + Math.sin(now / 300 + w.phase) * 0.25;
         lx.globalAlpha = w.alpha * twinkle;
-        lx.shadowColor = '#fbbf24';
-        lx.shadowBlur = 20;
 
-        const wGrad = lx.createRadialGradient(w.x, w.y, 0, w.x, w.y, w.size * 3);
-        wGrad.addColorStop(0, 'rgba(255,255,255,0.95)');
-        wGrad.addColorStop(0.25, 'rgba(253,224,71,0.85)');
-        wGrad.addColorStop(0.6, 'rgba(251,191,36,0.4)');
-        wGrad.addColorStop(1, 'rgba(245,158,11,0)');
-        lx.fillStyle = wGrad;
-        lx.beginPath();
-        lx.arc(w.x, w.y, w.size * 3, 0, Math.PI * 2);
-        lx.fill();
+        if (w.done) {
+          // Deseo cumplido: resplandor rosa y blanco celestial
+          lx.shadowColor = '#f472b6';
+          lx.shadowBlur = 22;
 
-        // Centro blanco brillante
-        lx.fillStyle = '#fffef5';
-        lx.beginPath();
-        lx.arc(w.x, w.y, w.size * 0.6, 0, Math.PI * 2);
-        lx.fill();
+          const pGrad = lx.createRadialGradient(w.x, w.y, 0, w.x, w.y, w.size * 3.2);
+          pGrad.addColorStop(0, 'rgba(255,255,255,0.98)');
+          pGrad.addColorStop(0.3, 'rgba(244,114,182,0.9)');
+          pGrad.addColorStop(0.65, 'rgba(236,72,153,0.45)');
+          pGrad.addColorStop(1, 'rgba(219,39,119,0)');
+          lx.fillStyle = pGrad;
+          lx.beginPath();
+          lx.arc(w.x, w.y, w.size * 3.2, 0, Math.PI * 2);
+          lx.fill();
+
+          // Centro blanco-rosado brillante
+          lx.fillStyle = '#fff0f6';
+          lx.beginPath();
+          lx.arc(w.x, w.y, w.size * 0.65, 0, Math.PI * 2);
+          lx.fill();
+        } else {
+          // Deseo normal: esfera dorada resplandeciente
+          lx.shadowColor = '#fbbf24';
+          lx.shadowBlur = 20;
+
+          const wGrad = lx.createRadialGradient(w.x, w.y, 0, w.x, w.y, w.size * 3);
+          wGrad.addColorStop(0, 'rgba(255,255,255,0.95)');
+          wGrad.addColorStop(0.25, 'rgba(253,224,71,0.85)');
+          wGrad.addColorStop(0.6, 'rgba(251,191,36,0.4)');
+          wGrad.addColorStop(1, 'rgba(245,158,11,0)');
+          lx.fillStyle = wGrad;
+          lx.beginPath();
+          lx.arc(w.x, w.y, w.size * 3, 0, Math.PI * 2);
+          lx.fill();
+
+          // Centro blanco brillante
+          lx.fillStyle = '#fffef5';
+          lx.beginPath();
+          lx.arc(w.x, w.y, w.size * 0.6, 0, Math.PI * 2);
+          lx.fill();
+        }
 
         // Mostrar texto del deseo si fue tocada
         if (w.showText > 0) {
           const stAge = (now - w.showText) / 1000;
-          if (stAge < 3.5) {
+          if (stAge < 3.8) {
             let tAlpha = 1;
             if (stAge < 0.4) tAlpha = stAge / 0.4;
-            else if (stAge > 2.5) tAlpha = 1 - (stAge - 2.5) / 1.0;
+            else if (stAge > 2.8) tAlpha = 1 - (stAge - 2.8) / 1.0;
             lx.globalAlpha = tAlpha;
             lx.font = "italic 500 16px 'Cormorant Garamond',Georgia,serif";
             lx.textAlign = 'center';
             lx.textBaseline = 'bottom';
-            lx.shadowColor = 'rgba(251,191,36,0.9)';
-            lx.shadowBlur = 12;
-            lx.fillStyle = '#fef3c7';
-            lx.fillText(w.text, w.x, w.y - w.size * 3.5);
+            if (w.done) {
+              lx.shadowColor = 'rgba(244,114,182,0.95)';
+              lx.shadowBlur = 14;
+              lx.fillStyle = '#fce7f3';
+              lx.fillText('✓ ' + w.text, w.x, w.y - w.size * 3.5);
+            } else {
+              lx.shadowColor = 'rgba(251,191,36,0.9)';
+              lx.shadowBlur = 12;
+              lx.fillStyle = '#fef3c7';
+              lx.fillText(w.text, w.x, w.y - w.size * 3.5);
+            }
           } else {
             w.showText = 0;
           }
